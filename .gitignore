@@ -1,0 +1,9 @@
+_inbox
+_ph
+.vercel
+dist
+node_modules
+src/generated/prisma
+
+.env.local
+AGENTS.md
