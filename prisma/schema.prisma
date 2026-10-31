@@ -10,6 +10,6 @@ datasource db {
 generator erd {
   provider                  = "prisma-erd-generator"
   output                    = "../docs/generated/prisma-erd-generator/erd.svg"
-  includeRelationFormFields = true
+  includeRelationFromFields = true
   showIndexes               = true
 }
