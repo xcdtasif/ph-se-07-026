@@ -1,0 +1,31 @@
+model Property {
+  id          String         @id @default(uuid())
+  landlord_id String
+  category_id String
+  name        String
+  description String
+  location    String
+  images      String[]
+  rent        Decimal
+  deposit     Decimal
+  status      PropertyStatus @default(AVAILABLE)
+  created_at  DateTime       @default(now())
+  updated_at  DateTime       @updatedAt
+
+  landlord User     @relation(fields: [landlord_id], references: [id])
+  category Category @relation(fields: [category_id], references: [id])
+
+  requests Request[]
+  reviews  Review[]
+
+  @@index([landlord_id])
+  @@index([category_id])
+  @@index([status])
+  @@map("properties")
+}
+
+enum PropertyStatus {
+  AVAILABLE
+  RENTED
+  UNAVAILABLE
+}

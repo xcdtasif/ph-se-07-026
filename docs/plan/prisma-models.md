@@ -1,26 +1,24 @@
-## DB Tables
+## Prisma Models
 
-### users
+### User
 
 id
 name
 email
 password
-role (ADMIN, LANDLORD, TENANT)
+role
 is_banned
-
 created_at
 updated_at
 
-### categories
+### Category
 
 id
 name
-
 created_at
 updated_at
 
-### properties
+### Property
 
 id
 landlord_id
@@ -32,11 +30,10 @@ images
 rent
 deposit
 status
-
 created_at
 updated_at
 
-### requests
+### Request
 
 id
 tenant_id
@@ -44,27 +41,24 @@ property_id
 message
 move_in_date
 status
-
 created_at
 updated_at
 
-### payments
+### Payment
 
 id
 request_id
 amount
 status
-
 created_at
 updated_at
 
-### reviews
+### Review
 
 id
 tenant_id
 property_id
 rating
 comment
-
 created_at
 updated_at

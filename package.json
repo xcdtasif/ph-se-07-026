@@ -16,22 +16,13 @@
   "type": "module",
   "main": "dist/server.js",
   "scripts": {
-    "clean": "rm -rf dist",
-    "build": "npm run clean && tsc",
+    "dev": "tsx watch src/server.ts",
+    "build": "rm -rf dist && tsc",
     "start": "node dist/server.js",
-
     "db:migrate": "prisma migrate dev",
     "db:generate": "prisma generate",
-    "db": "npm run db:migrate && npm run db:generate",
-
-    "dev": "tsx watch src/server.ts",
-
-    "fmt:check": "oxfmt --check",
     "fmt": "oxfmt",
-    "lint": "oxlint",
-    "lint:fix": "oxlint --fix",
-    "oxc": "npm run fmt && npm run lint:fix",
-
+    "lint": "oxlint --fix",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "dependencies": {
@@ -41,12 +32,15 @@
     "express": "^5.3.0"
   },
   "devDependencies": {
+    "@mermaid-js/mermaid-cli": "^11.17.1",
     "@types/express": "^5.0.6",
     "@types/node": "^26.6.6",
     "oxfmt": "^0.75.0",
     "oxlint": "^1.90.0",
     "oxlint-tsgolint": "^7.0.2005",
     "prisma": "^7.10.1",
+    "prisma-erd-generator": "^3.2.1",
+    "puppeteer": "^25.16.0",
     "tsx": "^4.23.15",
     "typescript": "^7.0.2"
   },
@@ -56,6 +50,7 @@
   "allowScripts": {
     "esbuild@0.28.2": true,
     "@prisma/engines@7.10.1": true,
-    "prisma@7.10.1": true
+    "prisma@7.10.1": true,
+    "puppeteer@25.16.0": true
   }
 }
