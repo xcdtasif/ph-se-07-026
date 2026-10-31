@@ -34,14 +34,14 @@ export const env = {
   databaseUrl: getEnv("DATABASE_URL"),
   databaseUrlUnpooled: getEnv("DATABASE_URL_UNPOOLED"),
 
-  // jwtAccessSecret: getEnv("JWT_ACCESS_SECRET"),
-  // jwtAccessTokenExpiresIn: getEnv("JWT_ACCESS_TOKEN_EXPIRES_IN"),
-  // jwtRefreshSecret: getEnv("JWT_REFRESH_SECRET"),
-  // jwtRefreshTokenExpiresIn: getEnv("JWT_REFRESH_TOKEN_EXPIRES_IN"),
+  bcryptSaltRounds: getEnvAsNumber("BCRYPT_SALT_ROUNDS"),
 
-  // bcryptSaltRounds: getEnvAsNumber("BCRYPT_SALT_ROUNDS"),
+  jwtAccessSecret: getEnv("JWT_ACCESS_SECRET"),
+  jwtAccessTokenExpiresIn: getEnv("JWT_ACCESS_TOKEN_EXPIRES_IN"),
+  jwtRefreshSecret: getEnv("JWT_REFRESH_SECRET"),
+  jwtRefreshTokenExpiresIn: getEnv("JWT_REFRESH_TOKEN_EXPIRES_IN"),
 
-  // stripeSecretKey: getEnv("STRIPE_SECRET_KEY"),
-  // stripeWebhookSecret: getEnv("STRIPE_WEBHOOK_SECRET"),
-  // stripeProductPriceId: getEnv("STRIPE_PRODUCT_PRICE_ID"),
+  stripeSecretKey: getEnv("STRIPE_SECRET_KEY"),
+  stripeProductPriceId: getEnv("STRIPE_PRODUCT_PRICE_ID"),
+  stripeWebhookSecret: getEnv("STRIPE_WEBHOOK_SECRET"),
 } as const
