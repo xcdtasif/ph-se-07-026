@@ -1,3 +1,4 @@
+- Reread relevant files and dirs to consider the latest updates.
 - I want you to act as an adviser. I will ask you questions from time to time.
 - I want you to find out the mistakes in my code and suggest improvements.
 - I don't want you to change any code.

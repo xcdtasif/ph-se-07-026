@@ -1,0 +1,19 @@
+model Payment {
+  id         String        @id @default(uuid())
+  request_id String
+  amount     Decimal
+  status     PaymentStatus @default(PENDING)
+  created_at DateTime      @default(now())
+  updated_at DateTime      @updatedAt
+
+  request Request @relation(fields: [request_id], references: [id])
+
+  @@index([request_id])
+  @@map("payments")
+}
+
+enum PaymentStatus {
+  PENDING
+  COMPLETED
+  FAILED
+}
