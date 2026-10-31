@@ -1,0 +1,19 @@
+model Review {
+  id          String   @id @default(uuid())
+  tenant_id   String
+  property_id String
+  request_id  String
+  rating      Int      @db.SmallInt
+  comment     String
+  created_at  DateTime @default(now())
+  updated_at  DateTime @updatedAt
+
+  tenant   User     @relation(fields: [tenant_id], references: [id])
+  property Property @relation(fields: [property_id], references: [id])
+  request  Request  @relation(fields: [request_id], references: [id])
+
+  @@unique([tenant_id, request_id])
+  @@index([tenant_id])
+  @@index([property_id])
+  @@map("reviews")
+}

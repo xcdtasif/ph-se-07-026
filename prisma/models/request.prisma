@@ -1,0 +1,29 @@
+model Request {
+  id           String        @id @default(uuid())
+  tenant_id    String
+  property_id  String
+  message      String
+  move_in_date DateTime
+  status       RequestStatus @default(PENDING)
+  created_at   DateTime      @default(now())
+  updated_at   DateTime      @updatedAt
+
+  tenant   User     @relation(fields: [tenant_id], references: [id])
+  property Property @relation(fields: [property_id], references: [id])
+
+  payments Payment[]
+  review   Review[]
+
+  @@index([tenant_id])
+  @@index([property_id])
+  @@index([status])
+  @@map("requests")
+}
+
+enum RequestStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  ACTIVE
+  COMPLETED
+}
