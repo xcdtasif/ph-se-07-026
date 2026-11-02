@@ -1,6 +1,5 @@
 _inbox
 _ph
-.fallow
 .vercel
 dist
 node_modules
@@ -8,4 +7,3 @@ src/generated/prisma
 
 .env*
 !.env.example
-.fallowrc.json

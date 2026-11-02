@@ -30,6 +30,7 @@ if (!validNodeEnv.includes(nodeEnv)) {
 export const env = {
   nodeEnv: getEnv("NODE_ENV"),
   port: getEnvAsNumber("PORT"),
+  clientUrl: getEnv("CLIENT_URL"),
 
   databaseUrl: getEnv("DATABASE_URL"),
   databaseUrlUnpooled: getEnv("DATABASE_URL_UNPOOLED"),

@@ -13,6 +13,7 @@
   },
   "rules": {
     "typescript/no-floating-promises": "error",
-    "typescript/no-unsafe-assignment": "warn"
+    "typescript/no-unsafe-assignment": "warn",
+    "unicorn/filename-case": ["error", { "case": "kebabCase" }]
   }
 }
