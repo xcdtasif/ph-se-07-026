@@ -3,7 +3,7 @@ model User {
   name       String
   email      String   @unique
   password   String
-  role       UserRole @default(TENANT)
+  role       UserRole
   is_banned  Boolean  @default(false)
   created_at DateTime @default(now())
   updated_at DateTime @updatedAt
