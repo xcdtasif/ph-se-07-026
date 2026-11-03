@@ -7,6 +7,7 @@ import { env } from "./config/env.js"
 import { errorHandler } from "./middlewares/error-handler.js"
 import { notFound } from "./middlewares/not-found.js"
 import { authRouter } from "./modules/auth/auth.routes.js"
+import "./types/express.js"
 
 const app: Application = express()
 

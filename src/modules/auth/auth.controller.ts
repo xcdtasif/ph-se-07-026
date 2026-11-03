@@ -1,6 +1,7 @@
 import type { Request, Response } from "express"
 import httpStatus from "http-status"
 
+import { AppError } from "../../utils/app-error.js"
 import { sendResponse } from "../../utils/send-response.js"
 import { authCookies } from "./auth.cookies.js"
 import type { LoginUserPayload, RegisterUserPayload } from "./auth.schema.js"
@@ -42,4 +43,17 @@ const logoutUser = (_req: Request, res: Response) => {
   })
 }
 
-export const authController = { registerUser, loginUser, logoutUser }
+const getMe = (req: Request, res: Response) => {
+  if (!req.user) {
+    throw new AppError(httpStatus.UNAUTHORIZED, "Authentication required")
+  }
+
+  sendResponse(res, {
+    success: true,
+    statusCode: httpStatus.OK,
+    message: "Profile fetched successfully",
+    data: req.user,
+  })
+}
+
+export const authController = { registerUser, loginUser, logoutUser, getMe }

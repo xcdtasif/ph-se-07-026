@@ -1,5 +1,6 @@
 import { Router } from "express"
 
+import { authenticate } from "../../middlewares/authenticate.js"
 import { validate } from "../../middlewares/validate.js"
 import { authController } from "./auth.controller.js"
 import { loginUserSchema, registerUserSchema } from "./auth.schema.js"
@@ -11,7 +12,7 @@ router.post("/register", validate(registerUserSchema, "body"), authController.re
 router.post("/login", validate(loginUserSchema, "body"), authController.loginUser)
 
 router.post("/logout", authController.logoutUser)
-// router.get("/me")
+router.get("/me", authenticate, authController.getMe)
 // router.post("/refresh")
 
 export const authRouter = router
