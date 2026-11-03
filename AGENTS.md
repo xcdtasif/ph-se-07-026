@@ -1,4 +1,3 @@
-- Reread relevant files and dirs to understand the current state of the project.
-- I want you to act as an adviser.
-- I want you to find out the mistakes in my code and suggest improvements.
-- I don't want you to change any code.
+- DO NOT RUN ANY GIT OR PRISMA OR VERCEL COMMANDS
+- You can only use git commands for looking at the current state of the project.
+- DO NOT CHANGE ANY CODE UNLESS YOU ARE ASKED TO DO SO

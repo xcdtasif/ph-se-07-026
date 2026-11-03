@@ -1,19 +1,19 @@
 model Review {
-  id          String   @id @default(uuid())
-  tenant_id   String
-  property_id String
-  request_id  String
-  rating      Int      @db.SmallInt
-  comment     String
-  created_at  DateTime @default(now())
-  updated_at  DateTime @updatedAt
+  id         String   @id @default(uuid())
+  tenantId   String   @map("tenant_id")
+  propertyId String   @map("property_id")
+  requestId  String   @map("request_id")
+  rating     Int      @db.SmallInt
+  comment    String
+  createdAt  DateTime @default(now()) @map("created_at")
+  updatedAt  DateTime @updatedAt @map("updated_at")
 
-  tenant   User     @relation(fields: [tenant_id], references: [id])
-  property Property @relation(fields: [property_id], references: [id])
-  request  Request  @relation(fields: [request_id], references: [id])
+  tenant   User     @relation(fields: [tenantId], references: [id])
+  property Property @relation(fields: [propertyId], references: [id])
+  request  Request  @relation(fields: [requestId], references: [id])
 
-  @@unique([tenant_id, request_id])
-  @@index([tenant_id])
-  @@index([property_id])
+  @@unique([tenantId, requestId])
+  @@index([tenantId])
+  @@index([propertyId])
   @@map("reviews")
 }

@@ -1,7 +1,7 @@
 model Property {
   id          String         @id @default(uuid())
-  landlord_id String
-  category_id String
+  landlordId  String         @map("landlord_id")
+  categoryId  String         @map("category_id")
   name        String
   description String
   location    String
@@ -9,17 +9,17 @@ model Property {
   rent        Decimal
   deposit     Decimal
   status      PropertyStatus @default(AVAILABLE)
-  created_at  DateTime       @default(now())
-  updated_at  DateTime       @updatedAt
+  createdAt   DateTime       @default(now()) @map("created_at")
+  updatedAt   DateTime       @updatedAt @map("updated_at")
 
-  landlord User     @relation(fields: [landlord_id], references: [id])
-  category Category @relation(fields: [category_id], references: [id])
+  landlord User     @relation(fields: [landlordId], references: [id])
+  category Category @relation(fields: [categoryId], references: [id])
 
   requests Request[]
   reviews  Review[]
 
-  @@index([landlord_id])
-  @@index([category_id])
+  @@index([landlordId])
+  @@index([categoryId])
   @@index([status])
   @@map("properties")
 }

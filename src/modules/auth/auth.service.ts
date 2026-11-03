@@ -1,10 +1,8 @@
 import httpStatus from "http-status"
 
-import { env } from "../../config/env.js"
 import { prisma } from "../../lib/prisma.js"
 import { AppError } from "../../utils/app-error.js"
-import { jwtUtils } from "../../utils/jwt.js"
-import type { RegisterUserPayload } from "./auth.schema.js"
+import type { LoginUserPayload, RegisterUserPayload } from "./auth.schema.js"
 import { authUtils } from "./auth.utils.js"
 
 const registerUser = async (payload: RegisterUserPayload) => {
@@ -34,21 +32,36 @@ const registerUser = async (payload: RegisterUserPayload) => {
     },
   })
 
-  const accessToken = jwtUtils.createToken(
-    { userId: user.id, role: user.role },
-    env.JWT_ACCESS_SECRET,
-    env.JWT_ACCESS_TOKEN_EXPIRES_IN,
-  )
-
-  const refreshToken = jwtUtils.createToken(
-    { userId: user.id, role: user.role },
-    env.JWT_REFRESH_SECRET,
-    env.JWT_REFRESH_TOKEN_EXPIRES_IN,
-  )
+  const { accessToken, refreshToken } = authUtils.generateTokens(user)
 
   return { user, accessToken, refreshToken }
 }
 
+const loginUser = async (payload: LoginUserPayload) => {
+  const { email, password } = payload
+
+  const user = await prisma.user.findUnique({ where: { email } })
+
+  const isPasswordValid = await authUtils.comparePassword(
+    password,
+    user?.password ?? authUtils.DUMMY_HASH,
+  )
+
+  if (!user || !isPasswordValid) {
+    throw new AppError(httpStatus.UNAUTHORIZED, "Invalid email or password")
+  }
+
+  if (user.isBanned) {
+    throw new AppError(httpStatus.FORBIDDEN, "Your account has been banned")
+  }
+
+  const { accessToken, refreshToken } = authUtils.generateTokens(user)
+  const { password: _password, ...safeUser } = user
+
+  return { user: safeUser, accessToken, refreshToken }
+}
+
 export const authService = {
   registerUser,
+  loginUser,
 }
