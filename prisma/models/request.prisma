@@ -1,21 +1,21 @@
 model Request {
-  id           String        @id @default(uuid())
-  tenant_id    String
-  property_id  String
-  message      String
-  move_in_date DateTime
-  status       RequestStatus @default(PENDING)
-  created_at   DateTime      @default(now())
-  updated_at   DateTime      @updatedAt
+  id         String        @id @default(uuid())
+  tenantId   String        @map("tenant_id")
+  propertyId String        @map("property_id")
+  message    String
+  moveInDate DateTime      @map("move_in_date")
+  status     RequestStatus @default(PENDING)
+  createdAt  DateTime      @default(now()) @map("created_at")
+  updatedAt  DateTime      @updatedAt @map("updated_at")
 
-  tenant   User     @relation(fields: [tenant_id], references: [id])
-  property Property @relation(fields: [property_id], references: [id])
+  tenant   User     @relation(fields: [tenantId], references: [id])
+  property Property @relation(fields: [propertyId], references: [id])
 
   payments Payment[]
   review   Review[]
 
-  @@index([tenant_id])
-  @@index([property_id])
+  @@index([tenantId])
+  @@index([propertyId])
   @@index([status])
   @@map("requests")
 }

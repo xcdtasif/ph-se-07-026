@@ -1,14 +1,14 @@
 model Payment {
-  id         String        @id @default(uuid())
-  request_id String
-  amount     Decimal
-  status     PaymentStatus @default(PENDING)
-  created_at DateTime      @default(now())
-  updated_at DateTime      @updatedAt
+  id        String        @id @default(uuid())
+  requestId String        @map("request_id")
+  amount    Decimal
+  status    PaymentStatus @default(PENDING)
+  createdAt DateTime      @default(now()) @map("created_at")
+  updatedAt DateTime      @updatedAt @map("updated_at")
 
-  request Request @relation(fields: [request_id], references: [id])
+  request Request @relation(fields: [requestId], references: [id])
 
-  @@index([request_id])
+  @@index([requestId])
   @@map("payments")
 }
 

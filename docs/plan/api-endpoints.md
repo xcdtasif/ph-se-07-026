@@ -6,8 +6,8 @@
 | --------------- | ------ | ------------------ | --------------- |
 | Register        | POST   | /api/auth/register | All Users       |
 | Log In          | POST   | /api/auth/login    | All Users       |
-| Log Out         | POST   | /api/auth/logout   | Logged-In Users |
-| Get Own Profile | GET    | /api/auth/profile  | Logged-In Users |
+| Log Out         | POST   | /api/auth/logout   | All Users       |
+| Get Own Profile | GET    | /api/auth/me       | Logged-In Users |
 | Refresh Token   | POST   | /api/auth/refresh  | Logged-In Users |
 
 ### Property

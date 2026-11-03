@@ -16,3 +16,10 @@ export const registerUserSchema = z.strictObject({
 })
 
 export type RegisterUserPayload = z.output<typeof registerUserSchema>
+
+export const loginUserSchema = z.strictObject({
+  email: z.string().trim().toLowerCase().pipe(z.email()),
+  password: z.string().min(8).max(72),
+})
+
+export type LoginUserPayload = z.output<typeof loginUserSchema>
