@@ -2,6 +2,8 @@ import path from "path"
 
 import dotenv from "dotenv"
 
+import type { ExpiresIn } from "../utils/jwt.js"
+
 dotenv.config({ path: path.join(process.cwd(), ".env.local") })
 
 function getEnv(key: string): string {
@@ -20,6 +22,16 @@ function getEnvAsNumber(key: string): number {
   return value
 }
 
+function getEnvAsExpiresIn(key: string): ExpiresIn {
+  const value = getEnv(key)
+
+  if (!/^\d+[smhd]$/.test(value)) {
+    throw new Error(`Environment variable ${key} must look like "15m", "7d", "30s" or "2h"`)
+  }
+
+  return value as ExpiresIn
+}
+
 const nodeEnv = getEnv("NODE_ENV")
 const validNodeEnv = ["development", "production"]
 
@@ -28,21 +40,21 @@ if (!validNodeEnv.includes(nodeEnv)) {
 }
 
 export const env = {
-  nodeEnv: getEnv("NODE_ENV"),
-  port: getEnvAsNumber("PORT"),
-  clientUrl: getEnv("CLIENT_URL"),
+  NODE_ENV: getEnv("NODE_ENV"),
+  PORT: getEnvAsNumber("PORT"),
+  CLIENT_URL: getEnv("CLIENT_URL"),
 
-  databaseUrl: getEnv("DATABASE_URL"),
-  databaseUrlUnpooled: getEnv("DATABASE_URL_UNPOOLED"),
+  DATABASE_URL: getEnv("DATABASE_URL"),
+  DATABASE_URL_UNPOOLED: getEnv("DATABASE_URL_UNPOOLED"),
 
-  bcryptSaltRounds: getEnvAsNumber("BCRYPT_SALT_ROUNDS"),
+  BCRYPT_SALT_ROUNDS: getEnvAsNumber("BCRYPT_SALT_ROUNDS"),
 
-  jwtAccessSecret: getEnv("JWT_ACCESS_SECRET"),
-  jwtAccessTokenExpiresIn: getEnv("JWT_ACCESS_TOKEN_EXPIRES_IN"),
-  jwtRefreshSecret: getEnv("JWT_REFRESH_SECRET"),
-  jwtRefreshTokenExpiresIn: getEnv("JWT_REFRESH_TOKEN_EXPIRES_IN"),
+  JWT_ACCESS_SECRET: getEnv("JWT_ACCESS_SECRET"),
+  JWT_ACCESS_TOKEN_EXPIRES_IN: getEnvAsExpiresIn("JWT_ACCESS_TOKEN_EXPIRES_IN"),
+  JWT_REFRESH_SECRET: getEnv("JWT_REFRESH_SECRET"),
+  JWT_REFRESH_TOKEN_EXPIRES_IN: getEnvAsExpiresIn("JWT_REFRESH_TOKEN_EXPIRES_IN"),
 
-  stripeSecretKey: getEnv("STRIPE_SECRET_KEY"),
-  stripeProductPriceId: getEnv("STRIPE_PRODUCT_PRICE_ID"),
-  stripeWebhookSecret: getEnv("STRIPE_WEBHOOK_SECRET"),
+  STRIPE_SECRET_KEY: getEnv("STRIPE_SECRET_KEY"),
+  STRIPE_PRODUCT_PRICE_ID: getEnv("STRIPE_PRODUCT_PRICE_ID"),
+  STRIPE_WEBHOOK_SECRET: getEnv("STRIPE_WEBHOOK_SECRET"),
 } as const

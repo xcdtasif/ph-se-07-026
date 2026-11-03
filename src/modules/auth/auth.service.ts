@@ -1,7 +1,9 @@
 import httpStatus from "http-status"
 
+import { env } from "../../config/env.js"
 import { prisma } from "../../lib/prisma.js"
 import { AppError } from "../../utils/app-error.js"
+import { jwtUtils } from "../../utils/jwt.js"
 import type { RegisterUserPayload } from "./auth.schema.js"
 import { authUtils } from "./auth.utils.js"
 
@@ -32,7 +34,19 @@ const registerUser = async (payload: RegisterUserPayload) => {
     },
   })
 
-  return user
+  const accessToken = jwtUtils.createToken(
+    { userId: user.id, role: user.role },
+    env.JWT_ACCESS_SECRET,
+    env.JWT_ACCESS_TOKEN_EXPIRES_IN,
+  )
+
+  const refreshToken = jwtUtils.createToken(
+    { userId: user.id, role: user.role },
+    env.JWT_REFRESH_SECRET,
+    env.JWT_REFRESH_TOKEN_EXPIRES_IN,
+  )
+
+  return { user, accessToken, refreshToken }
 }
 
 export const authService = {

@@ -1,8 +1,8 @@
 import type { ErrorRequestHandler } from "express"
 import httpStatus from "http-status"
 
-import { Prisma } from "../generated/prisma/client.js"
 import { AppError } from "../utils/app-error.js"
+import { handlePrismaError } from "../utils/handle-prisma-error.js"
 import { sendResponse } from "../utils/send-response.js"
 
 export const errorHandler: ErrorRequestHandler = (err, _req, res, next) => {
@@ -16,21 +16,19 @@ export const errorHandler: ErrorRequestHandler = (err, _req, res, next) => {
   let message = "Internal server error"
   let errors: unknown
 
+  const prismaError = handlePrismaError(err)
+
   if (err instanceof AppError) {
     statusCode = err.statusCode
     message = err.message
     errors = err.errors
-  } else if (err instanceof Prisma.PrismaClientKnownRequestError) {
-    if (err.code === "P2002") {
-      statusCode = httpStatus.CONFLICT
-      message = "Resource already exists"
-    } else if (err.code === "P2025") {
-      statusCode = httpStatus.NOT_FOUND
-      message = "Resource not found"
-    }
+  } else if (prismaError) {
+    statusCode = prismaError.statusCode
+    message = prismaError.message
+    errors = prismaError.errors
   }
 
-  if (statusCode === httpStatus.INTERNAL_SERVER_ERROR) {
+  if (statusCode >= httpStatus.INTERNAL_SERVER_ERROR) {
     console.error(err)
   }
 

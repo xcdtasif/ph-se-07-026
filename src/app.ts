@@ -11,7 +11,7 @@ import { authRouter } from "./modules/auth/auth.routes.js"
 const app: Application = express()
 
 const corsOptions: cors.CorsOptions = {
-  origin: env.clientUrl,
+  origin: env.CLIENT_URL,
   credentials: true,
 }
 
