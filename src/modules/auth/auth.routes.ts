@@ -7,12 +7,19 @@ import { loginUserSchema, registerUserSchema } from "./auth.schema.js"
 
 const router = Router()
 
+// Register User
 router.post("/register", validate(registerUserSchema, "body"), authController.registerUser)
 
+// Login User
 router.post("/login", validate(loginUserSchema, "body"), authController.loginUser)
 
+// Logout User
 router.post("/logout", authController.logoutUser)
+
+// Get Me
 router.get("/me", authenticate, authController.getMe)
-// router.post("/refresh")
+
+// Refresh Tokens
+router.post("/refresh", authController.refreshTokens)
 
 export const authRouter = router

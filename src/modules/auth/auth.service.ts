@@ -61,7 +61,29 @@ const loginUser = async (payload: LoginUserPayload) => {
   return { user: safeUser, accessToken, refreshToken }
 }
 
+const refreshTokens = async (token: string) => {
+  const { userId } = authUtils.verifyRefreshToken(token)
+
+  const user = await prisma.user.findUnique({
+    where: { id: userId },
+    omit: { password: true },
+  })
+
+  if (!user) {
+    throw new AppError(httpStatus.UNAUTHORIZED, "User no longer exists")
+  }
+
+  if (user.isBanned) {
+    throw new AppError(httpStatus.FORBIDDEN, "Your account has been banned")
+  }
+
+  const { accessToken, refreshToken } = authUtils.generateTokens(user)
+
+  return { user, accessToken, refreshToken }
+}
+
 export const authService = {
   registerUser,
   loginUser,
+  refreshTokens,
 }
