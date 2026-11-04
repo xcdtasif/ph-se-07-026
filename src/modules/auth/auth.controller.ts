@@ -56,4 +56,23 @@ const getMe = (req: Request, res: Response) => {
   })
 }
 
-export const authController = { registerUser, loginUser, logoutUser, getMe }
+const refreshTokens = async (req: Request, res: Response) => {
+  const token: unknown = req.cookies?.["refreshToken"]
+
+  if (typeof token !== "string" || token === "") {
+    throw new AppError(httpStatus.UNAUTHORIZED, "Authentication required")
+  }
+
+  const { user, accessToken, refreshToken } = await authService.refreshTokens(token)
+
+  authCookies.setAuthCookies(res, accessToken, refreshToken)
+
+  sendResponse(res, {
+    success: true,
+    statusCode: httpStatus.OK,
+    message: "Tokens refreshed successfully",
+    data: user,
+  })
+}
+
+export const authController = { registerUser, loginUser, logoutUser, getMe, refreshTokens }

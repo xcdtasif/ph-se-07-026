@@ -1,4 +1,0 @@
-- Do not run any Git, Prisma, or Vercel commands
-- You can run Git commands only to check the current status of the project
-- Do not change any code unless you are asked to do so
-- You can run any other commands to understand the project better

@@ -33,9 +33,19 @@ const generateTokens = (user: { id: string; role: UserRole }) => {
   return { accessToken, refreshToken }
 }
 
+const verifyAccessToken = (token: string) => {
+  return jwtUtils.verifyToken(token, env.JWT_ACCESS_SECRET)
+}
+
+const verifyRefreshToken = (token: string) => {
+  return jwtUtils.verifyToken(token, env.JWT_REFRESH_SECRET)
+}
+
 export const authUtils = {
   DUMMY_HASH,
   hashPassword,
   comparePassword,
   generateTokens,
+  verifyAccessToken,
+  verifyRefreshToken,
 }

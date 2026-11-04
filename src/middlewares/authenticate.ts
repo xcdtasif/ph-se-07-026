@@ -1,10 +1,9 @@
 import type { RequestHandler } from "express"
 import httpStatus from "http-status"
 
-import { env } from "../config/env.js"
 import { prisma } from "../lib/prisma.js"
+import { authUtils } from "../modules/auth/auth.utils.js"
 import { AppError } from "../utils/app-error.js"
-import { jwtUtils } from "../utils/jwt.js"
 
 export const authenticate: RequestHandler = async (req, _res, next) => {
   const token: unknown = req.cookies?.["accessToken"]
@@ -13,7 +12,7 @@ export const authenticate: RequestHandler = async (req, _res, next) => {
     throw new AppError(httpStatus.UNAUTHORIZED, "Authentication required")
   }
 
-  const { userId } = jwtUtils.verifyToken(token, env.JWT_ACCESS_SECRET)
+  const { userId } = authUtils.verifyAccessToken(token)
 
   const user = await prisma.user.findUnique({
     where: { id: userId },
