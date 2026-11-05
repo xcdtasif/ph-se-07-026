@@ -14,23 +14,23 @@ export const errorHandler: ErrorRequestHandler = (err, _req, res, next) => {
 
   let statusCode: number = httpStatus.INTERNAL_SERVER_ERROR
   let message = "Internal server error"
-  let errors: unknown
+  let errorDetails: unknown
 
   const prismaError = handlePrismaError(err)
 
   if (err instanceof AppError) {
     statusCode = err.statusCode
     message = err.message
-    errors = err.errors
+    errorDetails = err.errorDetails
   } else if (prismaError) {
     statusCode = prismaError.statusCode
     message = prismaError.message
-    errors = prismaError.errors
+    errorDetails = prismaError.errorDetails
   }
 
   if (statusCode >= httpStatus.INTERNAL_SERVER_ERROR) {
     console.error(err)
   }
 
-  sendResponse(res, { success: false, statusCode, message, errors })
+  sendResponse(res, { success: false, statusCode, message, errorDetails })
 }

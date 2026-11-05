@@ -5,7 +5,7 @@ import { Prisma } from "../generated/prisma/client.js"
 type MappedError = {
   statusCode: number
   message: string
-  errors?: unknown
+  errorDetails?: unknown
 }
 
 const getTargetFields = (meta: Record<string, unknown> | undefined): string[] | undefined => {
@@ -51,7 +51,7 @@ export const handlePrismaError = (err: unknown): MappedError | null => {
       return {
         statusCode: httpStatus.CONFLICT,
         message: fields ? `${fields.join(", ")} already exists` : "Resource already exists",
-        errors: fields ? { fields } : undefined,
+        errorDetails: fields ? { fields } : undefined,
       }
     }
 

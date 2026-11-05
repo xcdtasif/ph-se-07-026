@@ -12,7 +12,7 @@ type ResData<T> = {
   message: string
   data?: T
   meta?: Meta
-  errors?: unknown
+  errorDetails?: unknown
 }
 
 export const sendResponse = <T>(res: Response, resData: ResData<T>) => {
@@ -22,6 +22,6 @@ export const sendResponse = <T>(res: Response, resData: ResData<T>) => {
     message: resData.message,
     data: resData.data,
     meta: resData.meta,
-    errors: resData.errors,
+    errorDetails: resData.errorDetails,
   })
 }
