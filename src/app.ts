@@ -7,6 +7,7 @@ import { env } from "./config/env.js"
 import { errorHandler } from "./middlewares/error-handler.js"
 import { notFound } from "./middlewares/not-found.js"
 import { authRouter } from "./modules/auth/auth.routes.js"
+import { categoryRouter } from "./modules/category/category.routes.js"
 import "./types/express.js"
 
 const app: Application = express()
@@ -29,6 +30,7 @@ app.get("/", (_req: Request, res: Response) => {
 })
 
 app.use("/api/auth", authRouter)
+app.use("/api/categories", categoryRouter)
 
 app.use(notFound)
 app.use(errorHandler)
