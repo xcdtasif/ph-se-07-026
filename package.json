@@ -21,6 +21,8 @@
     "start": "node dist/server.js",
     "db:migrate": "prisma format && prisma migrate dev",
     "db:generate": "prisma generate",
+    "db:clear": "tsx src/db/clear.ts",
+    "db:seed": "tsx src/db/seed/index.ts",
     "fmt": "oxfmt",
     "lint": "oxlint --fix",
     "stripe:listen": "dotenv -c -- stripe listen --all-snapshot --forward-to localhost:$PORT/api/payments/confirm",
