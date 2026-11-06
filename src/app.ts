@@ -10,6 +10,7 @@ import { authRouter } from "./modules/auth/auth.routes.js"
 import { categoryRouter } from "./modules/category/category.routes.js"
 import { landlordPropertyRouter } from "./modules/property/property.landlord.routes.js"
 import { publicPropertyRouter } from "./modules/property/property.public.routes.js"
+import "./types/express.js"
 
 const app: Application = express()
 
