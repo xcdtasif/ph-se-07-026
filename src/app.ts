@@ -8,6 +8,8 @@ import { errorHandler } from "./middlewares/error-handler.js"
 import { notFound } from "./middlewares/not-found.js"
 import { authRouter } from "./modules/auth/auth.routes.js"
 import { categoryRouter } from "./modules/category/category.routes.js"
+import { landlordPropertyRouter } from "./modules/property/property.landlord.routes.js"
+import { publicPropertyRouter } from "./modules/property/property.public.routes.js"
 import "./types/express.js"
 
 const app: Application = express()
@@ -29,8 +31,15 @@ app.get("/", (_req: Request, res: Response) => {
   res.send("Server is running")
 })
 
+// Auth
 app.use("/api/auth", authRouter)
+
+// Category
 app.use("/api/categories", categoryRouter)
+
+// Property
+app.use("/api/properties", publicPropertyRouter)
+app.use("/api/landlord/properties", landlordPropertyRouter)
 
 app.use(notFound)
 app.use(errorHandler)
