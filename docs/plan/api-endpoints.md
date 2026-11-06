@@ -1,29 +1,11 @@
 ## API Endpoints
 
-### Property
-
-| Name               | Method | Endpoint            | Access    |
-| ------------------ | ------ | ------------------- | --------- |
-| Get All Properties | GET    | /api/properties     | All Users |
-| Get Property By ID | GET    | /api/properties/:id | All Users |
-
-### Category
-
-| Name               | Method | Endpoint        | Access    |
-| ------------------ | ------ | --------------- | --------- |
-| Get All Categories | GET    | /api/categories | All Users |
-| Update Category    | PATCH  | /api/categories | Admin     |
-| Delete Category    | DELETE | /api/categories | Admin     |
-
 ### Landlord
 
-| Name                  | Method | Endpoint                     | Access   |
-| --------------------- | ------ | ---------------------------- | -------- |
-| Create Property       | POST   | /api/landlord/properties     | Landlord |
-| Update Property       | PATCH  | /api/landlord/properties/:id | Landlord |
-| Delete Property       | DELETE | /api/landlord/properties/:id | Landlord |
-| Get Requests          | GET    | /api/landlord/requests       | Landlord |
-| Update Request Status | PATCH  | /api/landlord/requests/:id   | Landlord |
+| Name                  | Method | Endpoint                   | Access   |
+| --------------------- | ------ | -------------------------- | -------- |
+| Get Requests          | GET    | /api/landlord/requests     | Landlord |
+| Update Request Status | PATCH  | /api/landlord/requests/:id | Landlord |
 
 ### Request
 
