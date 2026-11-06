@@ -6,8 +6,8 @@ model Property {
   description String
   location    String
   images      String[]
-  rent        Decimal
-  deposit     Decimal
+  rent        Decimal        @db.Decimal(12, 2)
+  deposit     Decimal        @db.Decimal(12, 2)
   status      PropertyStatus @default(AVAILABLE)
   createdAt   DateTime       @default(now()) @map("created_at")
   updatedAt   DateTime       @updatedAt @map("updated_at")
