@@ -1,4 +1,5 @@
 import { prisma } from "../../lib/prisma.js"
+import { logCount } from "../utils/log-count.js"
 
 const CATEGORY_NAMES = ["Apartment", "House", "Studio", "Commercial"]
 
@@ -9,11 +10,11 @@ export const seedCategories = async () => {
   const missing = CATEGORY_NAMES.filter((name) => !existingNames.has(name.toLowerCase()))
 
   if (missing.length === 0) {
-    console.log("Categories already exist, skipping")
+    logCount(0, "category", "categories", "created")
     return
   }
 
   await prisma.category.createMany({ data: missing.map((name) => ({ name })) })
 
-  console.log(`Categories created: ${missing.join(", ")}`)
+  logCount(missing.length, "category", "categories", "created")
 }

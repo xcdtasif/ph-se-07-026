@@ -1,9 +1,10 @@
 import { prisma } from "../../lib/prisma.js"
 import { loginUserSchema } from "../../modules/auth/auth.schema.js"
 import { authUtils } from "../../modules/auth/auth.utils.js"
+import { logCount } from "../utils/log-count.js"
 
 export const seedAdmin = async () => {
-  const name = process.env["ADMIN_NAME"] || "Admin"
+  const name = process.env["ADMIN_NAME"] || "Admin 01"
   const { email, password } = loginUserSchema.parse({
     email: process.env["ADMIN_EMAIL"],
     password: process.env["ADMIN_PASSWORD"],
@@ -16,7 +17,7 @@ export const seedAdmin = async () => {
       throw new Error(`A non-admin user with email ${email} already exists`)
     }
 
-    console.log(`Admin ${email} already exists, skipping`)
+    logCount(0, "admin", "admins", "created")
     return
   }
 
@@ -29,5 +30,5 @@ export const seedAdmin = async () => {
     },
   })
 
-  console.log(`Admin ${email} created`)
+  logCount(1, "admin", "admins", "created")
 }
