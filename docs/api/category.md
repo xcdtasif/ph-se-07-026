@@ -39,7 +39,7 @@ Returns all categories sorted by name (A to Z). Not paginated.
 | ------ | ------ | --------------------------- |
 | `name` | string | Trimmed, 2 to 50 characters |
 
-**Example request body**
+**Example**
 
 ```json
 {
@@ -75,7 +75,7 @@ Returns all categories sorted by name (A to Z). Not paginated.
 | ------ | ------ | --------------------------- |
 | `name` | string | Trimmed, 2 to 50 characters |
 
-**Example request body**
+**Example**
 
 ```json
 {
