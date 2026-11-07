@@ -10,6 +10,8 @@ import { authRouter } from "./modules/auth/auth.routes.js"
 import { categoryRouter } from "./modules/category/category.routes.js"
 import { landlordPropertyRouter } from "./modules/property/property.landlord.routes.js"
 import { publicPropertyRouter } from "./modules/property/property.public.routes.js"
+import { landlordRequestRouter } from "./modules/request/request.landlord.routes.js"
+import { tenantRequestRouter } from "./modules/request/request.tenant.routes.js"
 import "./types/express.js"
 
 const app: Application = express()
@@ -40,6 +42,10 @@ app.use("/api/categories", categoryRouter)
 // Property
 app.use("/api/properties", publicPropertyRouter)
 app.use("/api/landlord/properties", landlordPropertyRouter)
+
+// Request
+app.use("/api/tenant/requests", tenantRequestRouter)
+app.use("/api/landlord/requests", landlordRequestRouter)
 
 app.use(notFound)
 app.use(errorHandler)
