@@ -3,7 +3,6 @@ model Request {
   tenantId   String        @map("tenant_id")
   propertyId String        @map("property_id")
   message    String
-  moveInDate DateTime      @map("move_in_date")
   status     RequestStatus @default(PENDING)
   createdAt  DateTime      @default(now()) @map("created_at")
   updatedAt  DateTime      @updatedAt @map("updated_at")
@@ -12,11 +11,10 @@ model Request {
   property Property @relation(fields: [propertyId], references: [id])
 
   payments Payment[]
-  review   Review[]
+  review   Review?
 
-  @@index([tenantId])
-  @@index([propertyId])
-  @@index([status])
+  @@index([tenantId, status])
+  @@index([propertyId, status])
   @@map("requests")
 }
 
