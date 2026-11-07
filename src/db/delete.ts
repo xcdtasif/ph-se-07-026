@@ -7,8 +7,10 @@ const deleteAll = async () => {
     throw new Error("Refusing to delete data when NODE_ENV is production")
   }
 
-  // Order follows the foreign keys: children are deleted before their parents.
-  // Not run in a transaction: deleting is safe to repeat if it fails halfway.
+  /*
+  Order follows the foreign keys: children are deleted before their parents.
+  Not run in a transaction: deleting is safe to repeat if it fails halfway.
+  */
   const reviews = await prisma.review.deleteMany()
   logCount(reviews.count, "review", "reviews", "deleted")
 

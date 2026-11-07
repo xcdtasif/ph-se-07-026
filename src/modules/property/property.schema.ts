@@ -1,10 +1,13 @@
 import z from "zod"
 
-// Matches the Decimal(12, 2) database columns
+/*
+Stripe charges the deposit and accepts at most 8 digits in the smallest unit (paisa), so every
+money field shares that cap. The Decimal(12, 2) database columns hold much more.
+*/
 const moneySchema = z
   .number()
   .multipleOf(0.01, { error: "Must have at most 2 decimal places" })
-  .max(9_999_999_999.99)
+  .max(999_999.99)
 
 export const propertyIdParamsSchema = z.strictObject({
   id: z.uuid(),
@@ -19,7 +22,7 @@ export const createPropertySchema = z.strictObject({
   location: z.string().trim().min(2).max(200),
   images: z.array(z.url()).min(1).max(2),
   rent: moneySchema.positive(),
-  deposit: moneySchema.nonnegative(),
+  deposit: moneySchema.positive(),
 })
 
 export type CreatePropertyPayload = z.output<typeof createPropertySchema>
