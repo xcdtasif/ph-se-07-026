@@ -12,7 +12,7 @@ model Review {
   property Property @relation(fields: [propertyId], references: [id])
   request  Request  @relation(fields: [requestId], references: [id])
 
-  @@unique([tenantId, requestId])
+  @@unique([requestId])
   @@index([tenantId])
   @@index([propertyId])
   @@map("reviews")

@@ -1,7 +1,7 @@
 model User {
   id        String   @id @default(uuid())
   name      String
-  email     String   @unique
+  email     String
   password  String
   role      UserRole
   isBanned  Boolean  @default(false) @map("is_banned")
@@ -12,6 +12,7 @@ model User {
   requests   Request[]
   reviews    Review[]
 
+  @@unique([email])
   @@map("users")
 }
 

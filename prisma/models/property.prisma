@@ -20,12 +20,13 @@ model Property {
 
   @@index([landlordId])
   @@index([categoryId])
-  @@index([status])
+  @@index([status, createdAt])
   @@map("properties")
 }
 
 enum PropertyStatus {
   AVAILABLE
-  RENTED
   UNAVAILABLE
+  RESERVED
+  RENTED
 }
