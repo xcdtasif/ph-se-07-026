@@ -1,20 +1,5 @@
 ## API Endpoints
 
-### Landlord
-
-| Name                  | Method | Endpoint                   | Access   |
-| --------------------- | ------ | -------------------------- | -------- |
-| Get Requests          | GET    | /api/landlord/requests     | Landlord |
-| Update Request Status | PATCH  | /api/landlord/requests/:id | Landlord |
-
-### Request
-
-| Name                  | Method | Endpoint          | Access |
-| --------------------- | ------ | ----------------- | ------ |
-| Create Request        | POST   | /api/requests     | Tenant |
-| Get Own Requests      | GET    | /api/requests     | Tenant |
-| Get Own Request By ID | GET    | /api/requests/:id | Tenant |
-
 ### Payment
 
 | Name                  | Method | Endpoint              | Access |
