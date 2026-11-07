@@ -11,6 +11,7 @@
 | [Auth](docs/api/auth.md)         | 5                        |
 | [Category](docs/api/category.md) | 4                        |
 | [Property](docs/api/property.md) | 5 (2 public, 3 landlord) |
+| [Request](docs/api/request.md)   | 5 (3 tenant, 2 landlord) |
 
 ### Conventions
 
@@ -37,7 +38,11 @@ Every response, success or error, has this shape:
   "statusCode": 200,
   "message": "Properties fetched successfully",
   "data": {},
-  "meta": { "page": 1, "limit": 10, "total": 42 },
+  "meta": {
+    "page": 1,
+    "limit": 10,
+    "total": 42
+  },
   "errorDetails": null
 }
 ```
@@ -55,7 +60,9 @@ Every response, success or error, has this shape:
   "message": "Validation of body failed",
   "errorDetails": {
     "formErrors": [],
-    "fieldErrors": { "email": ["Invalid email address"] }
+    "fieldErrors": {
+      "email": ["Invalid email address"]
+    }
   }
 }
 ```
@@ -76,10 +83,11 @@ bodies are strict: unknown fields are rejected with `400`.
 
 Enum values are `UPPER_SNAKE_CASE`.
 
-| Enum             | Values                               |
-| ---------------- | ------------------------------------ |
-| `UserRole`       | `ADMIN`, `LANDLORD`, `TENANT`        |
-| `PropertyStatus` | `AVAILABLE`, `RENTED`, `UNAVAILABLE` |
+| Enum             | Values                                                   |
+| ---------------- | -------------------------------------------------------- |
+| `UserRole`       | `ADMIN`, `LANDLORD`, `TENANT`                            |
+| `PropertyStatus` | `AVAILABLE`, `UNAVAILABLE`, `RESERVED`, `RENTED`         |
+| `RequestStatus`  | `PENDING`, `APPROVED`, `REJECTED`, `ACTIVE`, `COMPLETED` |
 
 ## Setup
 

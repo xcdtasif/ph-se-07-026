@@ -35,7 +35,7 @@ Creates an account and signs the user in (sets both auth cookies).
 | `password` | string | 8 to 72 characters (and at most 72 bytes)             |
 | `role`     | string | `LANDLORD` or `TENANT` (`ADMIN` cannot self-register) |
 
-**Example request body**
+**Example**
 
 ```json
 {
@@ -69,7 +69,7 @@ Signs in and sets both auth cookies.
 | `email`    | string | Valid email, trimmed and lowercased |
 | `password` | string | 8 to 72 characters                  |
 
-**Example request body**
+**Example**
 
 ```json
 {

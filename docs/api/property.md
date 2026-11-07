@@ -7,7 +7,7 @@
 
 ## Property object
 
-`rent` and `deposit` are decimals with 2 decimal places (up to 9,999,999,999.99) and are serialized as strings.
+`rent` and `deposit` are decimals with 2 decimal places (up to 999,999.99) and are serialized as strings.
 
 ```json
 {
@@ -26,15 +26,15 @@
   "status": "AVAILABLE",
   "createdAt": "2026-11-05T10:00:00.000Z",
   "updatedAt": "2026-11-05T10:00:00.000Z",
-  "category": {
-    "id": "9e8d7c6b-0000-4000-8000-000000000000",
-    "name": "Apartment",
-    "createdAt": "...",
-    "updatedAt": "..."
-  },
   "landlord": {
     "id": "a1b2c3d4-0000-4000-8000-000000000000",
     "name": "Landlord 01"
+  },
+  "category": {
+    "id": "9e8d7c6b-0000-4000-8000-000000000000",
+    "name": "Apartment",
+    "createdAt": "2026-11-05T09:00:00.000Z",
+    "updatedAt": "2026-11-05T09:00:00.000Z"
   }
 }
 ```
@@ -64,7 +64,7 @@ Unknown query params are rejected with `400`.
 **Example**
 
 ```
-GET /api/properties?search=dhaka&minRent=10000&maxRent=30000&sort=RENT_ASC&page=1&limit=10
+GET /api/properties?page=1&limit=10&search=dhaka&categoryId=9e8d7c6b-0000-4000-8000-000000000000&minRent=10000&maxRent=30000&sort=NEWEST
 ```
 
 **Responses**
@@ -117,9 +117,9 @@ Creates a property owned by the signed-in landlord. New properties start as `AVA
 | `location`    | string   | Trimmed, 2 to 200 characters             |
 | `images`      | string[] | 1 to 2 valid URLs                        |
 | `rent`        | number   | Greater than 0, at most 2 decimal places |
-| `deposit`     | number   | 0 or more, at most 2 decimal places      |
+| `deposit`     | number   | Greater than 0, at most 2 decimal places |
 
-**Example request body**
+**Example**
 
 ```json
 {
@@ -162,18 +162,31 @@ Partial update. Send at least one field.
 
 **Body** (all fields optional)
 
-| Field         | Type     | Rules                                                                  |
-| ------------- | -------- | ---------------------------------------------------------------------- |
-| `categoryId`  | UUID     | Must be an existing category                                           |
-| `name`        | string   | Trimmed, 2 to 100 characters                                           |
-| `description` | string   | Trimmed, 10 to 2000 characters                                         |
-| `location`    | string   | Trimmed, 2 to 200 characters                                           |
-| `images`      | string[] | 1 to 2 valid URLs. Replaces the existing list                          |
-| `rent`        | number   | Greater than 0, at most 2 decimal places                               |
-| `deposit`     | number   | 0 or more, at most 2 decimal places                                    |
-| `status`      | enum     | `AVAILABLE` or `UNAVAILABLE`. `RENTED` is set by the payment flow only |
+| Field         | Type     | Rules                                                                                              |
+| ------------- | -------- | -------------------------------------------------------------------------------------------------- |
+| `categoryId`  | UUID     | Must be an existing category                                                                       |
+| `name`        | string   | Trimmed, 2 to 100 characters                                                                       |
+| `description` | string   | Trimmed, 10 to 2000 characters                                                                     |
+| `location`    | string   | Trimmed, 2 to 200 characters                                                                       |
+| `images`      | string[] | 1 to 2 valid URLs. Replaces the existing list                                                      |
+| `rent`        | number   | Greater than 0, at most 2 decimal places                                                           |
+| `deposit`     | number   | Greater than 0, at most 2 decimal places                                                           |
+| `status`      | enum     | `AVAILABLE` or `UNAVAILABLE`. `RESERVED` and `RENTED` are set by the request and payment flow only |
 
-**Example request body**
+**Status changes**
+
+- `AVAILABLE` → `UNAVAILABLE` hides the property and rejects all its `PENDING` requests in the same
+  transaction.
+- `UNAVAILABLE` → `AVAILABLE` is allowed at any time.
+- A `RESERVED` or `RENTED` property (one with an `APPROVED` or `ACTIVE` request) cannot have its
+  status changed. Reject the `APPROVED` request or complete the `ACTIVE` one first.
+
+**Reserved properties**
+
+A `RESERVED` property cannot be edited at all, so the deposit a tenant is about to pay cannot change.
+A `RENTED` property can still be edited, except for its `status`.
+
+**Example**
 
 ```json
 {
@@ -184,15 +197,16 @@ Partial update. Send at least one field.
 
 **Responses**
 
-| Status | When                                     | Message                                                      |
-| ------ | ---------------------------------------- | ------------------------------------------------------------ |
-| 200    | Success                                  | `Property updated successfully`                              |
-| 400    | Validation failed                        | `Validation of params failed` or `Validation of body failed` |
-| 401    | Not signed in                            | `Authentication required`                                    |
-| 403    | Not a landlord                           | `You don't have permission to do this`                       |
-| 403    | Property belongs to another landlord     | `You don't own this property`                                |
-| 404    | Property or category not found           | `Property not found` or `Category not found`                 |
-| 409    | Changing `status` of a `RENTED` property | `Cannot change the status of a rented property`              |
+| Status | When                                                   | Message                                                      |
+| ------ | ------------------------------------------------------ | ------------------------------------------------------------ |
+| 200    | Success                                                | `Property updated successfully`                              |
+| 400    | Validation failed                                      | `Validation of params failed` or `Validation of body failed` |
+| 401    | Not signed in                                          | `Authentication required`                                    |
+| 403    | Not a landlord                                         | `You don't have permission to do this`                       |
+| 403    | Property belongs to another landlord                   | `You don't own this property`                                |
+| 404    | Property or category not found                         | `Property not found` or `Category not found`                 |
+| 409    | Changing `status` of a `RESERVED` or `RENTED` property | `Cannot change the status of a reserved or rented property`  |
+| 409    | Editing a `RESERVED` property                          | `Cannot update a reserved property`                          |
 
 ---
 
