@@ -9,8 +9,8 @@ import type {
   UpdatePropertyPayload,
 } from "./property.schema.js"
 const propertyInclude = {
-  category: true,
   landlord: { select: { id: true, name: true } },
+  category: true,
 } satisfies Prisma.PropertyInclude
 
 const orderByMap: Record<PropertyListQuery["sort"], Prisma.PropertyOrderByWithRelationInput> = {
@@ -100,19 +100,41 @@ const createProperty = async (landlordId: string, payload: CreatePropertyPayload
 }
 
 const updateProperty = async (id: string, landlordId: string, payload: UpdatePropertyPayload) => {
-  const property = await getOwnedProperty(id, landlordId)
+  await getOwnedProperty(id, landlordId)
 
   if (payload.categoryId) {
     await assertCategoryExists(payload.categoryId)
   }
 
-  if (payload.status && property.status === "RENTED") {
-    throw new AppError(httpStatus.CONFLICT, "Cannot change the status of a rented property")
-  }
-
   const data = payload as Prisma.PropertyUncheckedUpdateInput
 
-  return prisma.property.update({ where: { id }, data, include: propertyInclude })
+  return prisma.$transaction(async (tx) => {
+    if (payload.status) {
+      // RESERVED and RENTED are held by the request flow, so the landlord cannot override them.
+      // Checked in the write itself so a concurrent approval cannot be overwritten.
+      const { count } = await tx.property.updateMany({
+        where: { id, status: { in: ["AVAILABLE", "UNAVAILABLE"] } },
+        data: { status: payload.status },
+      })
+
+      if (count === 0) {
+        throw new AppError(
+          httpStatus.CONFLICT,
+          "Cannot change the status of a reserved or rented property",
+        )
+      }
+
+      // Hiding a property closes it to requests, so pending ones are rejected
+      if (payload.status === "UNAVAILABLE") {
+        await tx.request.updateMany({
+          where: { propertyId: id, status: "PENDING" },
+          data: { status: "REJECTED" },
+        })
+      }
+    }
+
+    return tx.property.update({ where: { id }, data, include: propertyInclude })
+  })
 }
 
 const deleteProperty = async (id: string, landlordId: string) => {
