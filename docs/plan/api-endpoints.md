@@ -1,14 +1,5 @@
 ## API Endpoints
 
-### Payment
-
-| Name                  | Method | Endpoint              | Access |
-| --------------------- | ------ | --------------------- | ------ |
-| Create Payment        | POST   | /api/payments/create  | Tenant |
-| Confirm Payment       | POST   | /api/payments/confirm | Tenant |
-| Get Own Payments      | GET    | /api/payments         | Tenant |
-| Get Own Payment By ID | GET    | /api/payments/:id     | Tenant |
-
 ### Review
 
 | Name                 | Method | Endpoint         | Access |

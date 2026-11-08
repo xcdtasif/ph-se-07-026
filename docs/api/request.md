@@ -43,6 +43,7 @@ Request status and property status move together:
 | `PENDING` → `REJECTED`  | Landlord       | none                     | any              |
 | `APPROVED` → `REJECTED` | Landlord       | `RESERVED` → `AVAILABLE` | `RESERVED`       |
 | `APPROVED` → `ACTIVE`   | Stripe webhook | `RESERVED` → `RENTED`    | `RESERVED`       |
+| `APPROVED` → `REJECTED` | Stripe webhook | `RESERVED` → `AVAILABLE` | `RESERVED`       |
 | `ACTIVE` → `COMPLETED`  | Landlord       | `RENTED` → `AVAILABLE`   | `RENTED`         |
 
 Rules that follow from this:
@@ -51,14 +52,18 @@ Rules that follow from this:
   `AVAILABLE` property and holds it as `RESERVED`.
 - A tenant can only create a request for an `AVAILABLE` property, so `RESERVED`, `RENTED` and
   `UNAVAILABLE` properties cannot be requested.
-- `RESERVED` means the deposit is pending. If the tenant is slow to pay, the landlord rejects the
-  `APPROVED` request and the property becomes `AVAILABLE` again.
+- `RESERVED` means the deposit is pending. If the tenant does not pay, the property is freed in
+  one of two ways: the landlord rejects the `APPROVED` request, or, once a checkout was started
+  and expired unpaid, the Stripe webhook rejects it.
 - `APPROVED` → `ACTIVE` is made by the Stripe webhook when the deposit is paid. It has no landlord
   or tenant endpoint, so the landlord `PATCH` cannot set `ACTIVE`. The webhook also moves every
   other `PENDING` request on that property to `REJECTED`. Requests are never deleted.
 - A landlord can toggle a property between `AVAILABLE` and `UNAVAILABLE`, and only while it is
   not `RESERVED` or `RENTED` (no `APPROVED` or `ACTIVE` request). Hiding a property rejects all its
   `PENDING` requests. To free a `RESERVED` property, reject its request.
+- A landlord cannot reject an `APPROVED` request while its tenant has a checkout in progress (a
+  `PENDING` payment younger than 35 minutes). The request returns to normal once the checkout is
+  paid or expires.
 - Each status change and its property change are applied in one transaction, so both succeed or
   neither does.
 
@@ -205,3 +210,4 @@ GET /api/landlord/requests?page=1&limit=10&status=PENDING
 | 409    | Property is not in the required status (see table above) | `Property is not available`, `Property is not reserved` or `Property is not rented` |
 | 409    | Transition not allowed                                   | `Cannot change a <FROM> request to <TO>`                                            |
 | 409    | Status changed concurrently                              | `Request status has changed, please retry`                                          |
+| 409    | Rejecting an `APPROVED` request during a checkout        | `The tenant is paying the deposit, try again after the checkout ends`               |

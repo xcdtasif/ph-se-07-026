@@ -12,6 +12,7 @@
 | [Category](docs/api/category.md) | 4                        |
 | [Property](docs/api/property.md) | 5 (2 public, 3 landlord) |
 | [Request](docs/api/request.md)   | 5 (3 tenant, 2 landlord) |
+| [Payment](docs/api/payment.md)   | 4 (3 tenant, 1 stripe)   |
 
 ### Conventions
 
@@ -74,7 +75,10 @@ Every response, success or error, has this shape:
 | 403    | Authenticated but not allowed (wrong role, banned, not the owner) |
 | 404    | Resource or route not found                                       |
 | 409    | Conflict (duplicate, or the action is blocked by existing data)   |
+| 429    | Payment provider rate limit                                       |
 | 500    | Internal server error                                             |
+| 502    | Payment provider (Stripe) rejected the request or failed          |
+| 503    | Database or payment provider unavailable                          |
 
 Unknown routes return `404` with the message `Route <METHOD> <path> not found`. Request
 bodies are strict: unknown fields are rejected with `400`.
@@ -88,6 +92,7 @@ Enum values are `UPPER_SNAKE_CASE`.
 | `UserRole`       | `ADMIN`, `LANDLORD`, `TENANT`                            |
 | `PropertyStatus` | `AVAILABLE`, `UNAVAILABLE`, `RESERVED`, `RENTED`         |
 | `RequestStatus`  | `PENDING`, `APPROVED`, `REJECTED`, `ACTIVE`, `COMPLETED` |
+| `PaymentStatus`  | `PENDING`, `COMPLETED`, `FAILED`                         |
 
 ## Setup
 
