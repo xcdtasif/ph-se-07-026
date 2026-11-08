@@ -1,13 +1,5 @@
 ## API Endpoints
 
-### Review
-
-| Name                 | Method | Endpoint         | Access |
-| -------------------- | ------ | ---------------- | ------ |
-| Create Review        | POST   | /api/reviews     | Tenant |
-| Get Own Reviews      | GET    | /api/reviews     | Tenant |
-| Get Own Review By ID | GET    | /api/reviews/:id | Tenant |
-
 ### Admin
 
 | Name                   | Method | Endpoint                  | Access |

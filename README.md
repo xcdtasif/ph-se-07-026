@@ -13,6 +13,7 @@
 | [Property](docs/api/property.md) | 5 (2 public, 3 landlord) |
 | [Request](docs/api/request.md)   | 5 (3 tenant, 2 landlord) |
 | [Payment](docs/api/payment.md)   | 4 (3 tenant, 1 stripe)   |
+| [Review](docs/api/review.md)     | 3 (tenant)               |
 
 ### Conventions
 
