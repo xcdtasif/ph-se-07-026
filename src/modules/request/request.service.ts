@@ -3,6 +3,7 @@ import httpStatus from "http-status"
 import type { Prisma, PropertyStatus, RequestStatus } from "../../generated/prisma/client.js"
 import { prisma } from "../../lib/prisma.js"
 import { AppError } from "../../utils/app-error.js"
+import { activeCheckoutWhere } from "../payment/payment.checkout.js"
 import type {
   CreateRequestPayload,
   RequestListQuery,
@@ -31,8 +32,10 @@ const landlordRequestInclude = {
 
 type PropertyChange = { from: PropertyStatus; to: PropertyStatus } | null
 
-// Request transitions a landlord may make, with the property status change each one causes.
-// APPROVED -> ACTIVE is made by the payment webhook, not here.
+/*
+Request transitions a landlord may make, with the property status change each one causes.
+APPROVED -> ACTIVE is made by the payment webhook, not here.
+*/
 const allowedTransitions: Partial<
   Record<RequestStatus, Partial<Record<UpdateRequestStatusPayload["status"], PropertyChange>>>
 > = {
@@ -176,6 +179,21 @@ const updateRequestStatus = async (
 
     if (count === 0) {
       throw new AppError(httpStatus.CONFLICT, "Request status has changed, please retry")
+    }
+
+    /*
+    Checked after the update above has locked the request row. Creating a payment holds the same
+    lock until its payment is inserted, so a reject and a new checkout cannot both succeed.
+    */
+    if (request.status === "APPROVED" && status === "REJECTED") {
+      const checkoutInProgress = await tx.payment.count({ where: activeCheckoutWhere(id) })
+
+      if (checkoutInProgress > 0) {
+        throw new AppError(
+          httpStatus.CONFLICT,
+          "The tenant is paying the deposit, try again after the checkout ends",
+        )
+      }
     }
 
     if (propertyChange) {

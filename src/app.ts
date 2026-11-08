@@ -8,6 +8,8 @@ import { errorHandler } from "./middlewares/error-handler.js"
 import { notFound } from "./middlewares/not-found.js"
 import { authRouter } from "./modules/auth/auth.routes.js"
 import { categoryRouter } from "./modules/category/category.routes.js"
+import { stripeWebhookRouter } from "./modules/payment/payment.stripe.routes.js"
+import { tenantPaymentRouter } from "./modules/payment/payment.tenant.routes.js"
 import { landlordPropertyRouter } from "./modules/property/property.landlord.routes.js"
 import { publicPropertyRouter } from "./modules/property/property.public.routes.js"
 import { landlordRequestRouter } from "./modules/request/request.landlord.routes.js"
@@ -23,7 +25,8 @@ const corsOptions: cors.CorsOptions = {
 
 app.use(cors(corsOptions))
 
-// app.use("/api/payments/confirm", express.raw({ type: "application/json" }))
+// Stripe needs the raw body to verify the webhook signature
+app.use("/api/stripe/webhook", express.raw({ type: "application/json" }))
 
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
@@ -46,6 +49,10 @@ app.use("/api/landlord/properties", landlordPropertyRouter)
 // Request
 app.use("/api/tenant/requests", tenantRequestRouter)
 app.use("/api/landlord/requests", landlordRequestRouter)
+
+// Payment
+app.use("/api/tenant/payments", tenantPaymentRouter)
+app.use("/api/stripe/webhook", stripeWebhookRouter)
 
 app.use(notFound)
 app.use(errorHandler)
