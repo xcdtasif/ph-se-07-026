@@ -3,6 +3,7 @@ import httpStatus from "http-status"
 
 import { AppError } from "../utils/app-error.js"
 import { handlePrismaError } from "../utils/handle-prisma-error.js"
+import { handleStripeError } from "../utils/handle-stripe-error.js"
 import { sendResponse } from "../utils/send-response.js"
 
 export const errorHandler: ErrorRequestHandler = (err, _req, res, next) => {
@@ -17,6 +18,7 @@ export const errorHandler: ErrorRequestHandler = (err, _req, res, next) => {
   let errorDetails: unknown
 
   const prismaError = handlePrismaError(err)
+  const stripeError = handleStripeError(err)
 
   if (err instanceof AppError) {
     statusCode = err.statusCode
@@ -26,6 +28,10 @@ export const errorHandler: ErrorRequestHandler = (err, _req, res, next) => {
     statusCode = prismaError.statusCode
     message = prismaError.message
     errorDetails = prismaError.errorDetails
+  } else if (stripeError) {
+    statusCode = stripeError.statusCode
+    message = stripeError.message
+    errorDetails = stripeError.errorDetails
   }
 
   if (statusCode >= httpStatus.INTERNAL_SERVER_ERROR) {
