@@ -1,6 +1,15 @@
 # Category
 
-Base path: `/api/categories`
+## Endpoints
+
+`:name` is a path param, `?…` means query params and `{…}` means a request body. Details are in each section.
+
+| Name                                      | Endpoint                        | Access |
+| ----------------------------------------- | ------------------------------- | ------ |
+| [Get All Categories](#get-all-categories) | `GET /api/categories`           | Public |
+| [Create Category](#create-category)       | `POST /api/categories {…}`      | Admin  |
+| [Update Category](#update-category)       | `PATCH /api/categories/:id {…}` | Admin  |
+| [Delete Category](#delete-category)       | `DELETE /api/categories/:id`    | Admin  |
 
 ## Category object
 

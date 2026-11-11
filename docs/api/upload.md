@@ -1,9 +1,5 @@
 # Upload
 
-| Group       | Base path          | Access                                            |
-| ----------- | ------------------ | ------------------------------------------------- |
-| UploadThing | `/api/uploadthing` | Landlord (UploadThing signature for its callback) |
-
 Property images are hosted on UploadThing. The browser uploads files straight to UploadThing, so
 image bytes never pass through this API. The API only authorizes the upload and later stores the
 returned URLs on a property.

@@ -1,6 +1,15 @@
 # Auth
 
-Base path: `/api/auth`
+## Endpoints
+
+`:name` is a path param, `?…` means query params and `{…}` means a request body. Details are in each section.
+
+| Name                              | Endpoint                      | Access        |
+| --------------------------------- | ----------------------------- | ------------- |
+| [Register User](#register-user)   | `POST /api/auth/register {…}` | Public        |
+| [Login User](#login-user)         | `POST /api/auth/login {…}`    | Public        |
+| [Logout User](#logout-user)       | `POST /api/auth/logout`       | Public        |
+| [Refresh Tokens](#refresh-tokens) | `POST /api/auth/refresh`      | Authenticated |
 
 ## User object
 
@@ -100,22 +109,6 @@ Clears both auth cookies.
 | Status | When    | Message                   |
 | ------ | ------- | ------------------------- |
 | 200    | Success | `Logged out successfully` |
-
----
-
-## Get Me
-
-`GET /api/auth/me` · Authenticated
-
-Returns the signed-in user.
-
-**Responses**
-
-| Status | When                         | Message                        |
-| ------ | ---------------------------- | ------------------------------ |
-| 200    | Success                      | `Profile fetched successfully` |
-| 401    | Not signed in / user deleted | `Authentication required`      |
-| 403    | Account is banned            | `Your account has been banned` |
 
 ---
 
