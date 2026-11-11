@@ -5,6 +5,7 @@ model Review {
   requestId  String   @map("request_id")
   rating     Int      @db.SmallInt
   comment    String
+  isHidden   Boolean  @default(false) @map("is_hidden")
   createdAt  DateTime @default(now()) @map("created_at")
   updatedAt  DateTime @updatedAt @map("updated_at")
 
