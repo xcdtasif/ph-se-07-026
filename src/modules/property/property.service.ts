@@ -3,11 +3,13 @@ import httpStatus from "http-status"
 import type { Prisma, PropertyStatus } from "../../generated/prisma/client.js"
 import { prisma } from "../../lib/prisma.js"
 import { AppError } from "../../utils/app-error.js"
+import { uploadService } from "../upload/upload.service.js"
 import type {
   CreatePropertyPayload,
   PropertyListQuery,
   UpdatePropertyPayload,
 } from "./property.schema.js"
+
 const propertyInclude = {
   landlord: { select: { id: true, name: true } },
   category: true,
@@ -100,7 +102,7 @@ const createProperty = async (landlordId: string, payload: CreatePropertyPayload
 }
 
 const updateProperty = async (id: string, landlordId: string, payload: UpdatePropertyPayload) => {
-  await getOwnedProperty(id, landlordId)
+  const existing = await getOwnedProperty(id, landlordId)
 
   if (payload.categoryId) {
     await assertCategoryExists(payload.categoryId)
@@ -115,7 +117,7 @@ const updateProperty = async (id: string, landlordId: string, payload: UpdatePro
   */
   const lockedStatuses: PropertyStatus[] = payload.status ? ["RESERVED", "RENTED"] : ["RESERVED"]
 
-  return prisma.$transaction(async (tx) => {
+  const updated = await prisma.$transaction(async (tx) => {
     const { count } = await tx.property.updateMany({
       where: { id, status: { notIn: lockedStatuses } },
       data,
@@ -140,10 +142,19 @@ const updateProperty = async (id: string, landlordId: string, payload: UpdatePro
 
     return tx.property.findUniqueOrThrow({ where: { id }, include: propertyInclude })
   })
+
+  if (payload.images) {
+    const newImages = payload.images
+    await uploadService.deleteUnusedImages(
+      existing.images.filter((url) => !newImages.includes(url)),
+    )
+  }
+
+  return updated
 }
 
 const deleteProperty = async (id: string, landlordId: string) => {
-  await getOwnedProperty(id, landlordId)
+  const existing = await getOwnedProperty(id, landlordId)
 
   const requestCount = await prisma.request.count({ where: { propertyId: id } })
 
@@ -155,6 +166,8 @@ const deleteProperty = async (id: string, landlordId: string) => {
   }
 
   await prisma.property.delete({ where: { id } })
+
+  await uploadService.deleteUnusedImages(existing.images)
 }
 
 export const propertyService = {

@@ -15,6 +15,7 @@ import { publicPropertyRouter } from "./modules/property/property.public.routes.
 import { landlordRequestRouter } from "./modules/request/request.landlord.routes.js"
 import { tenantRequestRouter } from "./modules/request/request.tenant.routes.js"
 import { tenantReviewRouter } from "./modules/review/review.tenant.routes.js"
+import { uploadRouter } from "./modules/upload/upload.routes.js"
 import "./types/express.js"
 
 const app: Application = express()
@@ -57,6 +58,9 @@ app.use("/api/stripe/webhook", stripeWebhookRouter)
 
 // Review
 app.use("/api/tenant/reviews", tenantReviewRouter)
+
+// Upload
+app.use("/api/uploadthing", uploadRouter)
 
 app.use(notFound)
 app.use(errorHandler)

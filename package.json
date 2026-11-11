@@ -39,6 +39,7 @@
     "http-status": "^2.1.0",
     "jsonwebtoken": "^9.0.3",
     "stripe": "~22.3.2",
+    "uploadthing": "^7.7.4",
     "zod": "^4.6.7"
   },
   "devDependencies": {
@@ -64,6 +65,7 @@
     "esbuild@0.28.2": true,
     "@prisma/engines@7.10.1": true,
     "prisma@7.10.1": true,
-    "puppeteer@25.16.0": true
+    "puppeteer@25.16.0": true,
+    "msgpackr-extract@3.0.7": true
   }
 }

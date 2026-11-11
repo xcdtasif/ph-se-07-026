@@ -1,4 +1,5 @@
 import { prisma } from "../../lib/prisma.js"
+import { PLACEHOLDER_IMAGE_URL } from "../../modules/upload/upload.constants.js"
 import { logCount } from "../utils/log-count.js"
 import { LANDLORDS } from "./landlords.js"
 
@@ -82,8 +83,6 @@ const PROPERTIES: SeedProperty[] = [
   },
 ]
 
-const slugify = (value: string) => value.toLowerCase().replace(/[^a-z0-9]+/g, "-")
-
 export const seedProperties = async () => {
   const landlords = await prisma.user.findMany({
     where: { email: { in: LANDLORDS.map((landlord) => landlord.email) }, role: "LANDLORD" },
@@ -118,16 +117,11 @@ export const seedProperties = async () => {
         throw new Error(`Category ${category} not found, seed categories first`)
       }
 
-      const slug = slugify(property.name)
-
       return {
         ...property,
         landlordId: landlords[index % landlords.length]!.id,
         categoryId,
-        images: [
-          `https://picsum.photos/seed/${slug}-1/800/600`,
-          `https://picsum.photos/seed/${slug}-2/800/600`,
-        ],
+        images: [PLACEHOLDER_IMAGE_URL],
       }
     }),
   })

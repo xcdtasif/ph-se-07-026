@@ -1,5 +1,7 @@
 import z from "zod"
 
+import { UPLOAD_URL_PREFIX } from "../../lib/uploadthing.js"
+
 /*
 Stripe charges the deposit and accepts at most 8 digits in the smallest unit (paisa), so every
 money field shares that cap. The Decimal(12, 2) database columns hold much more.
@@ -8,6 +10,9 @@ const moneySchema = z
   .number()
   .multipleOf(0.01, { error: "Must have at most 2 decimal places" })
   .max(999_999.99)
+
+// Only files uploaded to our own UploadThing app are accepted as property images
+const imageUrlSchema = z.url().startsWith(UPLOAD_URL_PREFIX)
 
 export const propertyIdParamsSchema = z.strictObject({
   id: z.uuid(),
@@ -20,7 +25,7 @@ export const createPropertySchema = z.strictObject({
   name: z.string().trim().min(2).max(100),
   description: z.string().trim().min(10).max(2000),
   location: z.string().trim().min(2).max(200),
-  images: z.array(z.url()).min(1).max(2),
+  images: z.array(imageUrlSchema).min(1).max(2),
   rent: moneySchema.positive(),
   deposit: moneySchema.positive(),
 })

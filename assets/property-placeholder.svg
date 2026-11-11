@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="800" viewBox="0 -2.67 820 546.67">
+  <rect y="-2.67" width="820" height="546.67" fill="#b8c1c8"/>
+  <g fill="none" stroke="#fff" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" transform="translate(.5 .5)">
+    <!-- ground -->
+    <path d="M241 416.5 H550"/>
+    <!-- tall slanted building -->
+    <path d="M250.5 416.5 V158 L358.5 204 V416.5"/>
+    <path d="M276 241.5 H333 M276 265.5 H333 M276 290.5 H333 M276 314.5 H333 M276 338.5 H333"/>
+    <path d="M281.5 416.5 V372.5 H327.5 V416.5"/>
+    <!-- tower and antenna -->
+    <path d="M355.5 105 V143"/>
+    <path d="M313.5 185 V143 H398 V233.5"/>
+    <path d="M313.5 181.5 H398"/>
+    <!-- right building -->
+    <path d="M358.5 233.5 H436.5 V416.5"/>
+    <path d="M385.5 260.5 V270.8 M385.5 290 V300.3 M385.5 319.5 V329.8 M385.5 349 V359.3 M385.5 378.5 V388.8"/>
+    <path d="M409.5 260.5 V270.8 M409.5 290 V300.3 M409.5 319.5 V329.8 M409.5 349 V359.3 M409.5 378.5 V388.8"/>
+    <!-- sun -->
+    <circle cx="516" cy="140" r="35.5"/>
+    <!-- clouds -->
+    <path d="M428.5 207 V203 A11.5 11.5 0 0 1 436.5 192 A18.5 18.5 0 0 1 473.5 192 V196 C483 195.5 491 200 493 206"/>
+    <path d="M440 250.5 H466 A19 19 0 0 1 479 232 A24 24 0 1 1 526.4 236 A20 20 0 0 1 552 254.5"/>
+    <!-- trees -->
+    <circle cx="474.5" cy="367" r="19"/>
+    <path d="M474.5 386 V416.5"/>
+    <circle cx="532.5" cy="327" r="19"/>
+    <circle cx="532.5" cy="367" r="19"/>
+    <path d="M532.5 386 V416.5"/>
+  </g>
+</svg>
