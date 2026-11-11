@@ -14,6 +14,7 @@
 | [Request](docs/api/request.md)   | 5 (3 tenant, 2 landlord) |
 | [Payment](docs/api/payment.md)   | 4 (3 tenant, 1 stripe)   |
 | [Review](docs/api/review.md)     | 3 (tenant)               |
+| [Upload](docs/api/upload.md)     | 1 (landlord)             |
 
 ### Conventions
 

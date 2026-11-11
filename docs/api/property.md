@@ -18,8 +18,8 @@
   "description": "Bright two-bedroom apartment with a balcony, close to the lake and public transport.",
   "location": "Dhanmondi, Dhaka",
   "images": [
-    "https://picsum.photos/seed/sunny-2-bed-apartment-in-dhanmondi-1/800/600",
-    "https://picsum.photos/seed/sunny-2-bed-apartment-in-dhanmondi-2/800/600"
+    "https://0j6bmu5elp.ufs.sh/f/sunny-2-bed-apartment-in-dhanmondi-1",
+    "https://0j6bmu5elp.ufs.sh/f/sunny-2-bed-apartment-in-dhanmondi-2"
   ],
   "rent": "28000",
   "deposit": "56000",
@@ -115,9 +115,12 @@ Creates a property owned by the signed-in landlord. New properties start as `AVA
 | `name`        | string   | Trimmed, 2 to 100 characters             |
 | `description` | string   | Trimmed, 10 to 2000 characters           |
 | `location`    | string   | Trimmed, 2 to 200 characters             |
-| `images`      | string[] | 1 to 2 valid URLs                        |
+| `images`      | string[] | 1 to 2 [UploadThing](upload.md) URLs     |
 | `rent`        | number   | Greater than 0, at most 2 decimal places |
 | `deposit`     | number   | Greater than 0, at most 2 decimal places |
+
+Upload the images first (see [Upload](upload.md)) and send the URLs it returns. URLs from any
+other host are rejected.
 
 **Example**
 
@@ -128,8 +131,8 @@ Creates a property owned by the signed-in landlord. New properties start as `AVA
   "description": "Quiet one-bedroom apartment with natural light, near the metro station and local market.",
   "location": "Mirpur 10, Dhaka",
   "images": [
-    "https://picsum.photos/seed/cozy-1-bed-apartment-in-mirpur-1/800/600",
-    "https://picsum.photos/seed/cozy-1-bed-apartment-in-mirpur-2/800/600"
+    "https://0j6bmu5elp.ufs.sh/f/cozy-1-bed-apartment-in-mirpur-1",
+    "https://0j6bmu5elp.ufs.sh/f/cozy-1-bed-apartment-in-mirpur-2"
   ],
   "rent": 18500.5,
   "deposit": 37000
@@ -168,7 +171,7 @@ Partial update. Send at least one field.
 | `name`        | string   | Trimmed, 2 to 100 characters                                                                       |
 | `description` | string   | Trimmed, 10 to 2000 characters                                                                     |
 | `location`    | string   | Trimmed, 2 to 200 characters                                                                       |
-| `images`      | string[] | 1 to 2 valid URLs. Replaces the existing list                                                      |
+| `images`      | string[] | 1 to 2 [UploadThing](upload.md) URLs. Replaces the existing list                                   |
 | `rent`        | number   | Greater than 0, at most 2 decimal places                                                           |
 | `deposit`     | number   | Greater than 0, at most 2 decimal places                                                           |
 | `status`      | enum     | `AVAILABLE` or `UNAVAILABLE`. `RESERVED` and `RENTED` are set by the request and payment flow only |
@@ -180,6 +183,11 @@ Partial update. Send at least one field.
 - `UNAVAILABLE` → `AVAILABLE` is allowed at any time.
 - A `RESERVED` or `RENTED` property (one with an `APPROVED` or `ACTIVE` request) cannot have its
   status changed. Reject the `APPROVED` request or complete the `ACTIVE` one first.
+
+**Images**
+
+`images` replaces the whole list. Files that were in the old list and are not in the new one are
+deleted from UploadThing, unless another property still uses them.
 
 **Reserved properties**
 
@@ -213,6 +221,8 @@ A `RENTED` property can still be edited, except for its `status`.
 ## Delete Property
 
 `DELETE /api/landlord/properties/:id` · Landlord (owner)
+
+The property's images are deleted from UploadThing, unless another property still uses them.
 
 **Params**
 
