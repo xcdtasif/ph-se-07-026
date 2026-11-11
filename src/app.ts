@@ -11,11 +11,13 @@ import { categoryRouter } from "./modules/category/category.routes.js"
 import { stripeWebhookRouter } from "./modules/payment/payment.stripe.routes.js"
 import { tenantPaymentRouter } from "./modules/payment/payment.tenant.routes.js"
 import { landlordPropertyRouter } from "./modules/property/property.landlord.routes.js"
-import { publicPropertyRouter } from "./modules/property/property.public.routes.js"
+import { propertyRouter } from "./modules/property/property.routes.js"
 import { landlordRequestRouter } from "./modules/request/request.landlord.routes.js"
 import { tenantRequestRouter } from "./modules/request/request.tenant.routes.js"
 import { tenantReviewRouter } from "./modules/review/review.tenant.routes.js"
 import { uploadRouter } from "./modules/upload/upload.routes.js"
+import { adminUserRouter } from "./modules/user/user.admin.routes.js"
+import { userRouter } from "./modules/user/user.routes.js"
 import "./types/express.js"
 
 const app: Application = express()
@@ -41,11 +43,15 @@ app.get("/", (_req: Request, res: Response) => {
 // Auth
 app.use("/api/auth", authRouter)
 
+// User
+app.use("/api/users", userRouter)
+app.use("/api/admin/users", adminUserRouter)
+
 // Category
 app.use("/api/categories", categoryRouter)
 
 // Property
-app.use("/api/properties", publicPropertyRouter)
+app.use("/api/properties", propertyRouter)
 app.use("/api/landlord/properties", landlordPropertyRouter)
 
 // Request

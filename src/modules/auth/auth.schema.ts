@@ -1,9 +1,10 @@
 import z from "zod"
 
 import { UserRole } from "../../generated/prisma/enums.js"
+import { nameSchema } from "../user/user.schema.js"
 
 export const registerUserSchema = z.strictObject({
-  name: z.string().trim().min(2).max(100),
+  name: nameSchema,
   email: z.string().trim().toLowerCase().pipe(z.email()),
   password: z
     .string()

@@ -12,4 +12,4 @@ router.get("/", validate(propertyListQuerySchema, "query"), propertyController.g
 // Get Property By ID
 router.get("/:id", validate(propertyIdParamsSchema, "params"), propertyController.getPropertyById)
 
-export const publicPropertyRouter = router
+export const propertyRouter = router

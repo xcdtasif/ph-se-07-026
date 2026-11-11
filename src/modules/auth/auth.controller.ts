@@ -43,19 +43,6 @@ const logoutUser = (_req: Request, res: Response) => {
   })
 }
 
-const getMe = (req: Request, res: Response) => {
-  if (!req.user) {
-    throw new AppError(httpStatus.UNAUTHORIZED, "Authentication required")
-  }
-
-  sendResponse(res, {
-    success: true,
-    statusCode: httpStatus.OK,
-    message: "Profile fetched successfully",
-    data: req.user,
-  })
-}
-
 const refreshTokens = async (req: Request, res: Response) => {
   const token: unknown = req.cookies?.["refreshToken"]
 
@@ -75,4 +62,4 @@ const refreshTokens = async (req: Request, res: Response) => {
   })
 }
 
-export const authController = { registerUser, loginUser, logoutUser, getMe, refreshTokens }
+export const authController = { registerUser, loginUser, logoutUser, refreshTokens }
