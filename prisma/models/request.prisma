@@ -20,6 +20,7 @@ model Request {
 
 enum RequestStatus {
   PENDING
+  CANCELLED
   APPROVED
   REJECTED
   ACTIVE
