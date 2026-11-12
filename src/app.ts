@@ -13,6 +13,7 @@ import { tenantPaymentRouter } from "./modules/payment/payment.tenant.routes.js"
 import { adminPropertyRouter } from "./modules/property/property.admin.routes.js"
 import { landlordPropertyRouter } from "./modules/property/property.landlord.routes.js"
 import { propertyRouter } from "./modules/property/property.routes.js"
+import { adminRequestRouter } from "./modules/request/request.admin.routes.js"
 import { landlordRequestRouter } from "./modules/request/request.landlord.routes.js"
 import { tenantRequestRouter } from "./modules/request/request.tenant.routes.js"
 import { tenantReviewRouter } from "./modules/review/review.tenant.routes.js"
@@ -59,6 +60,7 @@ app.use("/api/admin/properties", adminPropertyRouter)
 // Request
 app.use("/api/tenant/requests", tenantRequestRouter)
 app.use("/api/landlord/requests", landlordRequestRouter)
+app.use("/api/admin/requests", adminRequestRouter)
 
 // Payment
 app.use("/api/tenant/payments", tenantPaymentRouter)

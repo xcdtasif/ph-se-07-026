@@ -37,3 +37,10 @@ export const updateLandlordRequestStatusSchema = z.strictObject({
 })
 
 export type UpdateLandlordRequestStatusPayload = z.output<typeof updateLandlordRequestStatusSchema>
+
+export const adminRequestListQuerySchema = requestListQuerySchema.extend({
+  tenantId: z.uuid().optional(),
+  propertyId: z.uuid().optional(),
+})
+
+export type AdminRequestListQuery = z.output<typeof adminRequestListQuerySchema>

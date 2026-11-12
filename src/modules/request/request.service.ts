@@ -6,6 +6,7 @@ import { AppError } from "../../utils/app-error.js"
 import { activeCheckoutWhere } from "../payment/payment.checkout.js"
 import { visiblePropertyWhere } from "../property/property.filters.js"
 import type {
+  AdminRequestListQuery,
   CreateRequestPayload,
   RequestListQuery,
   UpdateLandlordRequestStatusPayload,
@@ -28,6 +29,11 @@ const tenantRequestInclude = {
 } satisfies Prisma.RequestInclude
 
 const landlordRequestInclude = {
+  tenant: { select: { id: true, name: true, email: true } },
+  property: { select: propertySelect },
+} satisfies Prisma.RequestInclude
+
+const adminRequestInclude = {
   tenant: { select: { id: true, name: true, email: true } },
   property: { select: propertySelect },
 } satisfies Prisma.RequestInclude
@@ -267,6 +273,28 @@ const updateLandlordRequestStatus = async (
   )
 }
 
+const getAdminRequests = async (query: AdminRequestListQuery) => {
+  const { status, tenantId, propertyId } = query
+
+  const where: Prisma.RequestWhereInput = {
+    ...(status ? { status } : {}),
+    ...(tenantId ? { tenantId } : {}),
+    ...(propertyId ? { propertyId } : {}),
+  }
+
+  const [requests, total] = await Promise.all([
+    prisma.request.findMany({
+      where,
+      include: adminRequestInclude,
+      orderBy: { createdAt: "desc" },
+      ...paginate(query),
+    }),
+    prisma.request.count({ where }),
+  ])
+
+  return { requests, meta: { page: query.page, limit: query.limit, total } }
+}
+
 export const requestService = {
   createRequest,
   getTenantRequests,
@@ -274,4 +302,5 @@ export const requestService = {
   updateTenantRequestStatus,
   getLandlordRequests,
   updateLandlordRequestStatus,
+  getAdminRequests,
 }

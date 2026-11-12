@@ -4,6 +4,7 @@ import httpStatus from "http-status"
 import { AppError } from "../../utils/app-error.js"
 import { sendResponse } from "../../utils/send-response.js"
 import type {
+  AdminRequestListQuery,
   CreateRequestPayload,
   RequestIdParams,
   RequestListQuery,
@@ -108,6 +109,20 @@ const updateLandlordRequestStatus = async (
   })
 }
 
+const getAdminRequests = async (req: Request, res: Response) => {
+  const { requests, meta } = await requestService.getAdminRequests(
+    req.query as unknown as AdminRequestListQuery,
+  )
+
+  sendResponse(res, {
+    success: true,
+    statusCode: httpStatus.OK,
+    message: "Requests fetched successfully",
+    data: requests,
+    meta,
+  })
+}
+
 export const requestController = {
   createRequest,
   getTenantRequests,
@@ -115,4 +130,5 @@ export const requestController = {
   updateTenantRequestStatus,
   getLandlordRequests,
   updateLandlordRequestStatus,
+  getAdminRequests,
 }
