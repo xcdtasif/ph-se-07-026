@@ -1,6 +1,8 @@
 import z from "zod"
 
-const requestStatusSchema = z.enum(["PENDING", "APPROVED", "REJECTED", "ACTIVE", "COMPLETED"])
+import { RequestStatus } from "../../generated/prisma/enums.js"
+
+const requestStatusSchema = z.enum(RequestStatus)
 
 export const requestIdParamsSchema = z.strictObject({
   id: z.uuid(),
@@ -23,9 +25,15 @@ export const requestListQuerySchema = z.strictObject({
 
 export type RequestListQuery = z.output<typeof requestListQuerySchema>
 
+export const updateTenantRequestStatusSchema = z.strictObject({
+  status: z.literal("CANCELLED"),
+})
+
+export type UpdateTenantRequestStatusPayload = z.output<typeof updateTenantRequestStatusSchema>
+
 // ACTIVE is set by the payment webhook only
-export const updateRequestStatusSchema = z.strictObject({
+export const updateLandlordRequestStatusSchema = z.strictObject({
   status: z.enum(["APPROVED", "REJECTED", "COMPLETED"]),
 })
 
-export type UpdateRequestStatusPayload = z.output<typeof updateRequestStatusSchema>
+export type UpdateLandlordRequestStatusPayload = z.output<typeof updateLandlordRequestStatusSchema>

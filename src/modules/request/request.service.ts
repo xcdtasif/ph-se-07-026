@@ -4,10 +4,12 @@ import type { Prisma, PropertyStatus, RequestStatus } from "../../generated/pris
 import { prisma } from "../../lib/prisma.js"
 import { AppError } from "../../utils/app-error.js"
 import { activeCheckoutWhere } from "../payment/payment.checkout.js"
+import { visiblePropertyWhere } from "../property/property.filters.js"
 import type {
   CreateRequestPayload,
   RequestListQuery,
-  UpdateRequestStatusPayload,
+  UpdateLandlordRequestStatusPayload,
+  UpdateTenantRequestStatusPayload,
 } from "./request.schema.js"
 
 const propertySelect = {
@@ -32,13 +34,22 @@ const landlordRequestInclude = {
 
 type PropertyChange = { from: PropertyStatus; to: PropertyStatus } | null
 
+type Transitions = Partial<Record<RequestStatus, Partial<Record<RequestStatus, PropertyChange>>>>
+
 /*
-Request transitions a landlord may make, with the property status change each one causes.
+Request transitions each side may make, with the property status change each one causes.
 APPROVED -> ACTIVE is made by the payment webhook, not here.
 */
-const allowedTransitions: Partial<
-  Record<RequestStatus, Partial<Record<UpdateRequestStatusPayload["status"], PropertyChange>>>
-> = {
+const tenantTransitions: Transitions = {
+  PENDING: {
+    CANCELLED: null,
+  },
+  APPROVED: {
+    CANCELLED: { from: "RESERVED", to: "AVAILABLE" },
+  },
+}
+
+const landlordTransitions: Transitions = {
   PENDING: {
     APPROVED: { from: "AVAILABLE", to: "RESERVED" },
     REJECTED: null,
@@ -60,8 +71,8 @@ const paginate = ({ page, limit }: RequestListQuery) => ({
 })
 
 const createRequest = async (tenantId: string, payload: CreateRequestPayload) => {
-  const property = await prisma.property.findUnique({
-    where: { id: payload.propertyId },
+  const property = await prisma.property.findFirst({
+    where: { id: payload.propertyId, ...visiblePropertyWhere },
   })
 
   if (!property) {
@@ -141,10 +152,98 @@ const getLandlordRequests = async (landlordId: string, query: RequestListQuery) 
   return { requests, meta: { page: query.page, limit: query.limit, total } }
 }
 
-const updateRequestStatus = async (
+const transitionRequest = <T>(
+  request: { id: string; status: RequestStatus; propertyId: string },
+  status: RequestStatus,
+  transitions: Transitions,
+  checkoutMessage: string,
+  read: (tx: Prisma.TransactionClient) => Promise<T>,
+) => {
+  const allowed = transitions[request.status]
+
+  if (!allowed || !(status in allowed)) {
+    throw new AppError(
+      httpStatus.CONFLICT,
+      `Cannot change a ${request.status} request to ${status}`,
+    )
+  }
+
+  const propertyChange = allowed[status]
+
+  return prisma.$transaction(async (tx) => {
+    // Guard on the status we validated so a concurrent change cannot be overwritten
+    const { count } = await tx.request.updateMany({
+      where: { id: request.id, status: request.status },
+      data: { status },
+    })
+
+    if (count === 0) {
+      throw new AppError(httpStatus.CONFLICT, "Request status has changed, please retry")
+    }
+
+    /*
+    Checked after the update above has locked the request row. Creating a payment holds the same
+    lock until its payment is inserted, so ending an approved request and a new checkout cannot
+    both succeed.
+    */
+    if (request.status === "APPROVED") {
+      const checkoutInProgress = await tx.payment.count({ where: activeCheckoutWhere(request.id) })
+
+      if (checkoutInProgress > 0) {
+        throw new AppError(httpStatus.CONFLICT, checkoutMessage)
+      }
+    }
+
+    if (propertyChange) {
+      const { count: propertyCount } = await tx.property.updateMany({
+        where: {
+          id: request.propertyId,
+          status: propertyChange.from,
+          ...(status === "APPROVED" ? visiblePropertyWhere : {}),
+        },
+        data: { status: propertyChange.to },
+      })
+
+      if (propertyCount === 0) {
+        throw new AppError(
+          httpStatus.CONFLICT,
+          `Property is not ${propertyChange.from.toLowerCase()}`,
+        )
+      }
+    }
+
+    return read(tx)
+  })
+}
+
+const updateTenantRequestStatus = async (
+  id: string,
+  tenantId: string,
+  { status }: UpdateTenantRequestStatusPayload,
+) => {
+  const request = await prisma.request.findUnique({ where: { id } })
+
+  if (!request) {
+    throw new AppError(httpStatus.NOT_FOUND, "Request not found")
+  }
+
+  if (request.tenantId !== tenantId) {
+    throw new AppError(httpStatus.FORBIDDEN, "This request isn't yours")
+  }
+
+  return transitionRequest(
+    request,
+    status,
+    tenantTransitions,
+    "You are paying the deposit, try again after the checkout ends",
+    (tx) => tx.request.findUniqueOrThrow({ where: { id }, include: tenantRequestInclude }),
+  )
+}
+
+const updateLandlordRequestStatus = async (
   id: string,
   landlordId: string,
-  { status }: UpdateRequestStatusPayload,
+  { status }: UpdateLandlordRequestStatusPayload,
 ) => {
   const request = await prisma.request.findUnique({
     where: { id },
@@ -159,68 +258,20 @@ const updateRequestStatus = async (
     throw new AppError(httpStatus.FORBIDDEN, "This request isn't for your property")
   }
 
-  const transitions = allowedTransitions[request.status]
-
-  if (!transitions || !(status in transitions)) {
-    throw new AppError(
-      httpStatus.CONFLICT,
-      `Cannot change a ${request.status} request to ${status}`,
-    )
-  }
-
-  const propertyChange = transitions[status]
-
-  return prisma.$transaction(async (tx) => {
-    // Guard on the status we validated so a concurrent change cannot be overwritten
-    const { count } = await tx.request.updateMany({
-      where: { id, status: request.status },
-      data: { status },
-    })
-
-    if (count === 0) {
-      throw new AppError(httpStatus.CONFLICT, "Request status has changed, please retry")
-    }
-
-    /*
-    Checked after the update above has locked the request row. Creating a payment holds the same
-    lock until its payment is inserted, so a reject and a new checkout cannot both succeed.
-    */
-    if (request.status === "APPROVED" && status === "REJECTED") {
-      const checkoutInProgress = await tx.payment.count({ where: activeCheckoutWhere(id) })
-
-      if (checkoutInProgress > 0) {
-        throw new AppError(
-          httpStatus.CONFLICT,
-          "The tenant is paying the deposit, try again after the checkout ends",
-        )
-      }
-    }
-
-    if (propertyChange) {
-      const { count: propertyCount } = await tx.property.updateMany({
-        where: { id: request.propertyId, status: propertyChange.from },
-        data: { status: propertyChange.to },
-      })
-
-      if (propertyCount === 0) {
-        throw new AppError(
-          httpStatus.CONFLICT,
-          `Property is not ${propertyChange.from.toLowerCase()}`,
-        )
-      }
-    }
-
-    return tx.request.findUniqueOrThrow({
-      where: { id },
-      include: landlordRequestInclude,
-    })
-  })
+  return transitionRequest(
+    request,
+    status,
+    landlordTransitions,
+    "The tenant is paying the deposit, try again after the checkout ends",
+    (tx) => tx.request.findUniqueOrThrow({ where: { id }, include: landlordRequestInclude }),
+  )
 }
 
 export const requestService = {
   createRequest,
   getTenantRequests,
   getTenantRequestById,
+  updateTenantRequestStatus,
   getLandlordRequests,
-  updateRequestStatus,
+  updateLandlordRequestStatus,
 }

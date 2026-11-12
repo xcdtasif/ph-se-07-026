@@ -7,7 +7,7 @@ import { requestController } from "./request.controller.js"
 import {
   requestIdParamsSchema,
   requestListQuerySchema,
-  updateRequestStatusSchema,
+  updateLandlordRequestStatusSchema,
 } from "./request.schema.js"
 
 const router = Router()
@@ -21,8 +21,8 @@ router.get("/", validate(requestListQuerySchema, "query"), requestController.get
 router.patch(
   "/:id",
   validate(requestIdParamsSchema, "params"),
-  validate(updateRequestStatusSchema, "body"),
-  requestController.updateRequestStatus,
+  validate(updateLandlordRequestStatusSchema, "body"),
+  requestController.updateLandlordRequestStatus,
 )
 
 export const landlordRequestRouter = router

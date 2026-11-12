@@ -7,7 +7,8 @@ import type {
   CreateRequestPayload,
   RequestIdParams,
   RequestListQuery,
-  UpdateRequestStatusPayload,
+  UpdateLandlordRequestStatusPayload,
+  UpdateTenantRequestStatusPayload,
 } from "./request.schema.js"
 import { requestService } from "./request.service.js"
 
@@ -56,6 +57,24 @@ const getTenantRequestById = async (req: Request<RequestIdParams>, res: Response
   })
 }
 
+const updateTenantRequestStatus = async (
+  req: Request<RequestIdParams, {}, UpdateTenantRequestStatusPayload>,
+  res: Response,
+) => {
+  const request = await requestService.updateTenantRequestStatus(
+    req.params.id,
+    getUserId(req),
+    req.body,
+  )
+
+  sendResponse(res, {
+    success: true,
+    statusCode: httpStatus.OK,
+    message: "Request cancelled successfully",
+    data: request,
+  })
+}
+
 const getLandlordRequests = async (req: Request, res: Response) => {
   const { requests, meta } = await requestService.getLandlordRequests(
     getUserId(req),
@@ -71,11 +90,15 @@ const getLandlordRequests = async (req: Request, res: Response) => {
   })
 }
 
-const updateRequestStatus = async (
-  req: Request<RequestIdParams, {}, UpdateRequestStatusPayload>,
+const updateLandlordRequestStatus = async (
+  req: Request<RequestIdParams, {}, UpdateLandlordRequestStatusPayload>,
   res: Response,
 ) => {
-  const request = await requestService.updateRequestStatus(req.params.id, getUserId(req), req.body)
+  const request = await requestService.updateLandlordRequestStatus(
+    req.params.id,
+    getUserId(req),
+    req.body,
+  )
 
   sendResponse(res, {
     success: true,
@@ -89,6 +112,7 @@ export const requestController = {
   createRequest,
   getTenantRequests,
   getTenantRequestById,
+  updateTenantRequestStatus,
   getLandlordRequests,
-  updateRequestStatus,
+  updateLandlordRequestStatus,
 }

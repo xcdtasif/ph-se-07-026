@@ -8,6 +8,7 @@ import {
   createRequestSchema,
   requestIdParamsSchema,
   requestListQuerySchema,
+  updateTenantRequestStatusSchema,
 } from "./request.schema.js"
 
 const router = Router()
@@ -25,6 +26,14 @@ router.get(
   "/:id",
   validate(requestIdParamsSchema, "params"),
   requestController.getTenantRequestById,
+)
+
+// Cancel Request
+router.patch(
+  "/:id",
+  validate(requestIdParamsSchema, "params"),
+  validate(updateTenantRequestStatusSchema, "body"),
+  requestController.updateTenantRequestStatus,
 )
 
 export const tenantRequestRouter = router
