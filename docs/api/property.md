@@ -49,7 +49,10 @@
 }
 ```
 
-`isHidden` is set by an admin only.
+`isHidden` is set by an admin only. Public reads, [Get All Properties](#get-all-properties) and
+[Get Property By ID](#get-property-by-id), also include `reviewCount` and `averageRating`, counted
+from the property's visible [reviews](review.md). `averageRating` is rounded to one decimal and is
+`null` when there are no reviews.
 
 ### Visibility
 
@@ -58,7 +61,7 @@ is written when a landlord is banned, so unbanning shows the properties again.
 
 | Action                                                 | Hidden or banned-landlord property |
 | ------------------------------------------------------ | ---------------------------------- |
-| Public list and get by ID                              | Not shown, `404` for a single read |
+| Public list, get by ID, and [reviews](review.md)       | Not shown, `404` for a single read |
 | Create a request                                       | `404 Property not found`           |
 | Landlord approves a `PENDING` request                  | `409 Property is not available`    |
 | Tenant creates or reuses a checkout                    | `409 Property is not available`    |
@@ -72,7 +75,7 @@ is written when a landlord is banned, so unbanning shows the properties again.
 `GET /api/properties` · Public
 
 Returns a paginated list of properties. Only `AVAILABLE` properties are listed, and only those that
-are not [hidden](#visibility).
+are not [hidden](#visibility). Each property includes `reviewCount` and `averageRating`.
 
 **Query**
 
@@ -110,7 +113,8 @@ is the number of properties matching the filters.
 
 `GET /api/properties/:id` · Public
 
-Returns a single property in any status, unless it is [hidden](#visibility).
+Returns a single property in any status, unless it is [hidden](#visibility). It includes
+`reviewCount` and `averageRating`.
 
 **Params**
 
@@ -276,7 +280,8 @@ The property's images are deleted from UploadThing, unless another property stil
 `GET /api/admin/properties` · Admin
 
 Returns a paginated list of all properties, newest first, including hidden ones and any status.
-Each property has the `landlord` object extended with `email` and `isBanned`.
+Each property has the `landlord` object extended with `email` and `isBanned`, and no rating
+summary.
 
 **Query**
 
