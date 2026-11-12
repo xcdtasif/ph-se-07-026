@@ -1,9 +1,18 @@
 # Request
 
-| Group    | Base path                | Access   |
-| -------- | ------------------------ | -------- |
-| Tenant   | `/api/tenant/requests`   | Tenant   |
-| Landlord | `/api/landlord/requests` | Landlord |
+## Endpoints
+
+`:name` is a path param, `?…` means query params and `{…}` means a request body. Details are in each section.
+
+| Name                                                                | Endpoint                               | Access   |
+| ------------------------------------------------------------------- | -------------------------------------- | -------- |
+| [Create Request](#create-request)                                   | `POST /api/tenant/requests {…}`        | Tenant   |
+| [Get Own Requests](#get-own-requests)                               | `GET /api/tenant/requests?…`           | Tenant   |
+| [Get Own Request By ID](#get-own-request-by-id)                     | `GET /api/tenant/requests/:id`         | Tenant   |
+| [Cancel Request](#cancel-request)                                   | `PATCH /api/tenant/requests/:id {…}`   | Tenant   |
+| [Get Requests For Own Properties](#get-requests-for-own-properties) | `GET /api/landlord/requests?…`         | Landlord |
+| [Update Request Status](#update-request-status)                     | `PATCH /api/landlord/requests/:id {…}` | Landlord |
+| [Get All Requests (Admin)](#get-all-requests-admin)                 | `GET /api/admin/requests?…`            | Admin    |
 
 ## Request object
 
@@ -36,15 +45,17 @@ match the order of `tenantId` and `propertyId`.
 
 Request status and property status move together:
 
-| Request change          | Changed by     | Property change          | Property must be |
-| ----------------------- | -------------- | ------------------------ | ---------------- |
-| (new) → `PENDING`       | Tenant         | none                     | `AVAILABLE`      |
-| `PENDING` → `APPROVED`  | Landlord       | `AVAILABLE` → `RESERVED` | `AVAILABLE`      |
-| `PENDING` → `REJECTED`  | Landlord       | none                     | any              |
-| `APPROVED` → `REJECTED` | Landlord       | `RESERVED` → `AVAILABLE` | `RESERVED`       |
-| `APPROVED` → `ACTIVE`   | Stripe webhook | `RESERVED` → `RENTED`    | `RESERVED`       |
-| `APPROVED` → `REJECTED` | Stripe webhook | `RESERVED` → `AVAILABLE` | `RESERVED`       |
-| `ACTIVE` → `COMPLETED`  | Landlord       | `RENTED` → `AVAILABLE`   | `RENTED`         |
+| Request change           | Changed by     | Property change          | Property must be |
+| ------------------------ | -------------- | ------------------------ | ---------------- |
+| (new) → `PENDING`        | Tenant         | none                     | `AVAILABLE`      |
+| `PENDING` → `APPROVED`   | Landlord       | `AVAILABLE` → `RESERVED` | `AVAILABLE`      |
+| `PENDING` → `REJECTED`   | Landlord       | none                     | any              |
+| `PENDING` → `CANCELLED`  | Tenant         | none                     | any              |
+| `APPROVED` → `REJECTED`  | Landlord       | `RESERVED` → `AVAILABLE` | `RESERVED`       |
+| `APPROVED` → `CANCELLED` | Tenant         | `RESERVED` → `AVAILABLE` | `RESERVED`       |
+| `APPROVED` → `ACTIVE`    | Stripe webhook | `RESERVED` → `RENTED`    | `RESERVED`       |
+| `APPROVED` → `REJECTED`  | Stripe webhook | `RESERVED` → `AVAILABLE` | `RESERVED`       |
+| `ACTIVE` → `COMPLETED`   | Landlord       | `RENTED` → `AVAILABLE`   | `RENTED`         |
 
 Rules that follow from this:
 
@@ -61,9 +72,14 @@ Rules that follow from this:
 - A landlord can toggle a property between `AVAILABLE` and `UNAVAILABLE`, and only while it is
   not `RESERVED` or `RENTED` (no `APPROVED` or `ACTIVE` request). Hiding a property rejects all its
   `PENDING` requests. To free a `RESERVED` property, reject its request.
-- A landlord cannot reject an `APPROVED` request while its tenant has a checkout in progress (a
-  `PENDING` payment younger than 35 minutes). The request returns to normal once the checkout is
-  paid or expires.
+- A tenant can cancel a `PENDING` or `APPROVED` request. Cancelling an `ACTIVE` request is not
+  possible. A cancelled request does not count as open, so the tenant can request the property again.
+- A landlord cannot reject, and a tenant cannot cancel, an `APPROVED` request while its tenant has a
+  checkout in progress (a `PENDING` payment younger than 35 minutes). The request returns to normal
+  once the checkout is paid or expires.
+- A request cannot be created or approved for a [hidden](property.md#visibility) property or one
+  whose landlord is banned. Rejecting and cancelling stay allowed, so such a request can always be
+  ended.
 - Each status change and its property change are applied in one transaction, so both succeed or
   neither does.
 
@@ -75,10 +91,10 @@ Rules that follow from this:
 
 **Body**
 
-| Field        | Type   | Rules                           |
-| ------------ | ------ | ------------------------------- |
-| `propertyId` | UUID   | Must be an `AVAILABLE` property |
-| `message`    | string | Trimmed, 10 to 1000 characters  |
+| Field        | Type   | Rules                                              |
+| ------------ | ------ | -------------------------------------------------- |
+| `propertyId` | UUID   | Must be an `AVAILABLE` property that is not hidden |
+| `message`    | string | Trimmed, 10 to 1000 characters                     |
 
 A tenant can have only one `PENDING`, `APPROVED` or `ACTIVE` request per property.
 
@@ -93,15 +109,15 @@ A tenant can have only one `PENDING`, `APPROVED` or `ACTIVE` request per propert
 
 **Responses**
 
-| Status | When                        | Message                                              |
-| ------ | --------------------------- | ---------------------------------------------------- |
-| 201    | Success                     | `Request created successfully`                       |
-| 400    | Validation failed           | `Validation of body failed`                          |
-| 401    | Not signed in               | `Authentication required`                            |
-| 403    | Not a tenant                | `You don't have permission to do this`               |
-| 404    | Property not found          | `Property not found`                                 |
-| 409    | Property is not `AVAILABLE` | `Property is not available`                          |
-| 409    | Open request already exists | `You already have an open request for this property` |
+| Status | When                         | Message                                              |
+| ------ | ---------------------------- | ---------------------------------------------------- |
+| 201    | Success                      | `Request created successfully`                       |
+| 400    | Validation failed            | `Validation of body failed`                          |
+| 401    | Not signed in                | `Authentication required`                            |
+| 403    | Not a tenant                 | `You don't have permission to do this`               |
+| 404    | Property not found or hidden | `Property not found`                                 |
+| 409    | Property is not `AVAILABLE`  | `Property is not available`                          |
+| 409    | Open request already exists  | `You already have an open request for this property` |
 
 ---
 
@@ -113,11 +129,11 @@ Returns the signed-in tenant's requests, newest first.
 
 **Query**
 
-| Param    | Type    | Default | Rules                                                    |
-| -------- | ------- | ------- | -------------------------------------------------------- |
-| `page`   | integer | `1`     | Minimum 1                                                |
-| `limit`  | integer | `10`    | 1 to 50                                                  |
-| `status` | enum    |         | `PENDING`, `APPROVED`, `REJECTED`, `ACTIVE`, `COMPLETED` |
+| Param    | Type    | Default | Rules                                                                 |
+| -------- | ------- | ------- | --------------------------------------------------------------------- |
+| `page`   | integer | `1`     | Minimum 1                                                             |
+| `limit`  | integer | `10`    | 1 to 50                                                               |
+| `status` | enum    |         | `PENDING`, `CANCELLED`, `APPROVED`, `REJECTED`, `ACTIVE`, `COMPLETED` |
 
 **Example**
 
@@ -152,6 +168,43 @@ GET /api/tenant/requests?page=1&limit=10&status=PENDING
 | 403    | Not a tenant                      | `You don't have permission to do this` |
 | 403    | Request belongs to another tenant | `This request isn't yours`             |
 | 404    | Request not found                 | `Request not found`                    |
+
+---
+
+## Cancel Request
+
+`PATCH /api/tenant/requests/:id` · Tenant (owner)
+
+**Body**
+
+| Field    | Type | Rules                                     |
+| -------- | ---- | ----------------------------------------- |
+| `status` | enum | `CANCELLED`, from `PENDING` or `APPROVED` |
+
+Cancelling an `APPROVED` request sets its property from `RESERVED` back to `AVAILABLE`. It is
+allowed even when the property is hidden or its landlord is banned.
+
+**Example**
+
+```json
+{
+  "status": "CANCELLED"
+}
+```
+
+**Responses**
+
+| Status | When                                               | Message                                                         |
+| ------ | -------------------------------------------------- | --------------------------------------------------------------- |
+| 200    | Success                                            | `Request cancelled successfully`                                |
+| 400    | Validation failed                                  | `Validation of params failed` or `Validation of body failed`    |
+| 401    | Not signed in                                      | `Authentication required`                                       |
+| 403    | Not a tenant                                       | `You don't have permission to do this`                          |
+| 403    | Request belongs to another tenant                  | `This request isn't yours`                                      |
+| 404    | Request not found                                  | `Request not found`                                             |
+| 409    | Request is not `PENDING` or `APPROVED`             | `Cannot change a <FROM> request to CANCELLED`                   |
+| 409    | Status changed concurrently                        | `Request status has changed, please retry`                      |
+| 409    | Cancelling an `APPROVED` request during a checkout | `You are paying the deposit, try again after the checkout ends` |
 
 ---
 
@@ -211,3 +264,39 @@ GET /api/landlord/requests?page=1&limit=10&status=PENDING
 | 409    | Transition not allowed                                   | `Cannot change a <FROM> request to <TO>`                                            |
 | 409    | Status changed concurrently                              | `Request status has changed, please retry`                                          |
 | 409    | Rejecting an `APPROVED` request during a checkout        | `The tenant is paying the deposit, try again after the checkout ends`               |
+
+---
+
+## Get All Requests (Admin)
+
+`GET /api/admin/requests` · Admin
+
+Returns a paginated list of all requests, newest first. Each request includes the `tenant` and
+`property` objects, as in the landlord view. Admins cannot change a request's status.
+
+**Query**
+
+| Param        | Type    | Default | Rules                                                                 |
+| ------------ | ------- | ------- | --------------------------------------------------------------------- |
+| `page`       | integer | `1`     | Minimum 1                                                             |
+| `limit`      | integer | `10`    | 1 to 50                                                               |
+| `status`     | enum    |         | `PENDING`, `CANCELLED`, `APPROVED`, `REJECTED`, `ACTIVE`, `COMPLETED` |
+| `tenantId`   | UUID    |         | Filter by tenant                                                      |
+| `propertyId` | UUID    |         | Filter by property                                                    |
+
+**Example**
+
+```
+GET /api/admin/requests?page=1&limit=10&status=APPROVED
+```
+
+**Responses**
+
+| Status | When              | Message                                |
+| ------ | ----------------- | -------------------------------------- |
+| 200    | Success           | `Requests fetched successfully`        |
+| 400    | Validation failed | `Validation of query failed`           |
+| 401    | Not signed in     | `Authentication required`              |
+| 403    | Not an admin      | `You don't have permission to do this` |
+
+`meta` is `{ page, limit, total }`.
