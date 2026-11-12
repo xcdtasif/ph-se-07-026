@@ -1,9 +1,18 @@
 # Property
 
-| Group    | Base path                  | Access   |
-| -------- | -------------------------- | -------- |
-| Public   | `/api/properties`          | Everyone |
-| Landlord | `/api/landlord/properties` | Landlord |
+## Endpoints
+
+`:name` is a path param, `?…` means query params and `{…}` means a request body. Details are in each section.
+
+| Name                                                      | Endpoint                                 | Access   |
+| --------------------------------------------------------- | ---------------------------------------- | -------- |
+| [Get All Properties](#get-all-properties)                 | `GET /api/properties?…`                  | Public   |
+| [Get Property By ID](#get-property-by-id)                 | `GET /api/properties/:id`                | Public   |
+| [Create Property](#create-property)                       | `POST /api/landlord/properties {…}`      | Landlord |
+| [Update Property](#update-property)                       | `PATCH /api/landlord/properties/:id {…}` | Landlord |
+| [Delete Property](#delete-property)                       | `DELETE /api/landlord/properties/:id`    | Landlord |
+| [Get All Properties (Admin)](#get-all-properties-admin)   | `GET /api/admin/properties?…`            | Admin    |
+| [Update Property Visibility](#update-property-visibility) | `PATCH /api/admin/properties/:id {…}`    | Admin    |
 
 ## Property object
 
@@ -24,6 +33,7 @@
   "rent": "28000",
   "deposit": "56000",
   "status": "AVAILABLE",
+  "isHidden": false,
   "createdAt": "2026-11-05T10:00:00.000Z",
   "updatedAt": "2026-11-05T10:00:00.000Z",
   "landlord": {
@@ -39,13 +49,30 @@
 }
 ```
 
+`isHidden` is set by an admin only.
+
+### Visibility
+
+A property is hidden from the public when an admin hides it or when its landlord is banned. Nothing
+is written when a landlord is banned, so unbanning shows the properties again.
+
+| Action                                                 | Hidden or banned-landlord property |
+| ------------------------------------------------------ | ---------------------------------- |
+| Public list and get by ID                              | Not shown, `404` for a single read |
+| Create a request                                       | `404 Property not found`           |
+| Landlord approves a `PENDING` request                  | `409 Property is not available`    |
+| Tenant creates or reuses a checkout                    | `409 Property is not available`    |
+| Landlord rejects or completes, tenant cancels          | Allowed                            |
+| Stripe webhook for a checkout that was already created | Processed normally                 |
+
 ---
 
 ## Get All Properties
 
 `GET /api/properties` · Public
 
-Returns a paginated list of properties. Only `AVAILABLE` properties are listed.
+Returns a paginated list of properties. Only `AVAILABLE` properties are listed, and only those that
+are not [hidden](#visibility).
 
 **Query**
 
@@ -83,7 +110,7 @@ is the number of properties matching the filters.
 
 `GET /api/properties/:id` · Public
 
-Returns a single property in any status.
+Returns a single property in any status, unless it is [hidden](#visibility).
 
 **Params**
 
@@ -93,11 +120,11 @@ Returns a single property in any status.
 
 **Responses**
 
-| Status | When               | Message                         |
-| ------ | ------------------ | ------------------------------- |
-| 200    | Success            | `Property fetched successfully` |
-| 400    | Validation failed  | `Validation of params failed`   |
-| 404    | Property not found | `Property not found`            |
+| Status | When                          | Message                         |
+| ------ | ----------------------------- | ------------------------------- |
+| 200    | Success                       | `Property fetched successfully` |
+| 400    | Validation failed             | `Validation of params failed`   |
+| 404    | Property not found, or hidden | `Property not found`            |
 
 ---
 
@@ -241,3 +268,73 @@ The property's images are deleted from UploadThing, unless another property stil
 | 403    | Property belongs to another landlord | `You don't own this property`                                             |
 | 404    | Property not found                   | `Property not found`                                                      |
 | 409    | Property has any requests            | `Cannot delete a property that has requests, mark it unavailable instead` |
+
+---
+
+## Get All Properties (Admin)
+
+`GET /api/admin/properties` · Admin
+
+Returns a paginated list of all properties, newest first, including hidden ones and any status.
+Each property has the `landlord` object extended with `email` and `isBanned`.
+
+**Query**
+
+| Param        | Type    | Default | Rules                                                                        |
+| ------------ | ------- | ------- | ---------------------------------------------------------------------------- |
+| `page`       | integer | `1`     | Minimum 1                                                                    |
+| `limit`      | integer | `10`    | 1 to 50                                                                      |
+| `search`     | string  |         | 1 to 100 characters. Case-insensitive match on name, location or description |
+| `landlordId` | UUID    |         | Filter by landlord                                                           |
+| `status`     | enum    |         | `AVAILABLE`, `UNAVAILABLE`, `RESERVED`, `RENTED`                             |
+| `isHidden`   | boolean |         | `true` or `false`                                                            |
+
+**Example**
+
+```
+GET /api/admin/properties?page=1&limit=10&isHidden=true
+```
+
+**Responses**
+
+| Status | When              | Message                                |
+| ------ | ----------------- | -------------------------------------- |
+| 200    | Success           | `Properties fetched successfully`      |
+| 400    | Validation failed | `Validation of query failed`           |
+| 401    | Not signed in     | `Authentication required`              |
+| 403    | Not an admin      | `You don't have permission to do this` |
+
+`meta` is `{ page, limit, total }`.
+
+---
+
+## Update Property Visibility
+
+`PATCH /api/admin/properties/:id` · Admin
+
+Hides or unhides a property. A hidden property follows the [visibility](#visibility) rules. Its
+`status` is not changed, its `PENDING` requests are not rejected, and the landlord cannot undo it.
+
+**Body**
+
+| Field      | Type    | Rules                         |
+| ---------- | ------- | ----------------------------- |
+| `isHidden` | boolean | `true` hides, `false` unhides |
+
+**Example**
+
+```json
+{
+  "isHidden": true
+}
+```
+
+**Responses**
+
+| Status | When               | Message                                                            |
+| ------ | ------------------ | ------------------------------------------------------------------ |
+| 200    | Success            | `Property hidden successfully` or `Property unhidden successfully` |
+| 400    | Validation failed  | `Validation of params failed` or `Validation of body failed`       |
+| 401    | Not signed in      | `Authentication required`                                          |
+| 403    | Not an admin       | `You don't have permission to do this`                             |
+| 404    | Property not found | `Property not found`                                               |
