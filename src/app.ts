@@ -10,6 +10,7 @@ import { authRouter } from "./modules/auth/auth.routes.js"
 import { categoryRouter } from "./modules/category/category.routes.js"
 import { stripeWebhookRouter } from "./modules/payment/payment.stripe.routes.js"
 import { tenantPaymentRouter } from "./modules/payment/payment.tenant.routes.js"
+import { adminPropertyRouter } from "./modules/property/property.admin.routes.js"
 import { landlordPropertyRouter } from "./modules/property/property.landlord.routes.js"
 import { propertyRouter } from "./modules/property/property.routes.js"
 import { landlordRequestRouter } from "./modules/request/request.landlord.routes.js"
@@ -53,6 +54,7 @@ app.use("/api/categories", categoryRouter)
 // Property
 app.use("/api/properties", propertyRouter)
 app.use("/api/landlord/properties", landlordPropertyRouter)
+app.use("/api/admin/properties", adminPropertyRouter)
 
 // Request
 app.use("/api/tenant/requests", tenantRequestRouter)

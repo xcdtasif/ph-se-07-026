@@ -4,10 +4,12 @@ import httpStatus from "http-status"
 import { AppError } from "../../utils/app-error.js"
 import { sendResponse } from "../../utils/send-response.js"
 import type {
+  AdminPropertyListQuery,
   CreatePropertyPayload,
   PropertyIdParams,
   PropertyListQuery,
   UpdatePropertyPayload,
+  UpdatePropertyVisibilityPayload,
 } from "./property.schema.js"
 import { propertyService } from "./property.service.js"
 
@@ -79,10 +81,40 @@ const deleteProperty = async (req: Request<PropertyIdParams>, res: Response) => 
   })
 }
 
+const getAdminProperties = async (req: Request, res: Response) => {
+  const { properties, meta } = await propertyService.getAdminProperties(
+    req.query as unknown as AdminPropertyListQuery,
+  )
+
+  sendResponse(res, {
+    success: true,
+    statusCode: httpStatus.OK,
+    message: "Properties fetched successfully",
+    data: properties,
+    meta,
+  })
+}
+
+const updatePropertyVisibility = async (
+  req: Request<PropertyIdParams, {}, UpdatePropertyVisibilityPayload>,
+  res: Response,
+) => {
+  const property = await propertyService.updatePropertyVisibility(req.params.id, req.body)
+
+  sendResponse(res, {
+    success: true,
+    statusCode: httpStatus.OK,
+    message: req.body.isHidden ? "Property hidden successfully" : "Property unhidden successfully",
+    data: property,
+  })
+}
+
 export const propertyController = {
   getAllProperties,
   getPropertyById,
   createProperty,
   updateProperty,
   deleteProperty,
+  getAdminProperties,
+  updatePropertyVisibility,
 }

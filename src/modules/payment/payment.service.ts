@@ -5,6 +5,7 @@ import type { Prisma } from "../../generated/prisma/client.js"
 import { prisma } from "../../lib/prisma.js"
 import { stripe } from "../../lib/stripe.js"
 import { AppError } from "../../utils/app-error.js"
+import { visiblePropertyWhere } from "../property/property.filters.js"
 import { CHECKOUT_EXPIRES_IN_SECONDS, activeCheckoutWhere } from "./payment.checkout.js"
 import type { CreatePaymentPayload, PaymentListQuery } from "./payment.schema.js"
 
@@ -59,6 +60,15 @@ const createPayment = async (
 
         if (count === 0) {
           throw new AppError(httpStatus.CONFLICT, "Only an approved request can be paid")
+        }
+
+        // A hidden property or banned landlord gets no new checkout, nor a reused open one
+        const isVisible = await tx.property.count({
+          where: { id: request.propertyId, ...visiblePropertyWhere },
+        })
+
+        if (isVisible === 0) {
+          throw new AppError(httpStatus.CONFLICT, "Property is not available")
         }
 
         // Reuse the open checkout so a tenant who closed the tab has only one payable session

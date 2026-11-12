@@ -1,5 +1,6 @@
 import z from "zod"
 
+import { PropertyStatus } from "../../generated/prisma/enums.js"
 import { UPLOAD_URL_PREFIX } from "../../lib/uploadthing.js"
 
 /*
@@ -59,3 +60,23 @@ export const propertyListQuerySchema = z
   })
 
 export type PropertyListQuery = z.output<typeof propertyListQuerySchema>
+
+export const adminPropertyListQuerySchema = z.strictObject({
+  page: z.coerce.number().int().min(1).default(1),
+  limit: z.coerce.number().int().min(1).max(50).default(10),
+  search: z.string().trim().min(1).max(100).optional(),
+  landlordId: z.uuid().optional(),
+  status: z.enum(PropertyStatus).optional(),
+  isHidden: z
+    .enum(["true", "false"])
+    .transform((value) => value === "true")
+    .optional(),
+})
+
+export type AdminPropertyListQuery = z.output<typeof adminPropertyListQuerySchema>
+
+export const updatePropertyVisibilitySchema = z.strictObject({
+  isHidden: z.boolean(),
+})
+
+export type UpdatePropertyVisibilityPayload = z.output<typeof updatePropertyVisibilitySchema>

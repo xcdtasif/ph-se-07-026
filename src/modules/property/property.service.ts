@@ -4,14 +4,22 @@ import type { Prisma, PropertyStatus } from "../../generated/prisma/client.js"
 import { prisma } from "../../lib/prisma.js"
 import { AppError } from "../../utils/app-error.js"
 import { uploadService } from "../upload/upload.service.js"
+import { visiblePropertyWhere } from "./property.filters.js"
 import type {
+  AdminPropertyListQuery,
   CreatePropertyPayload,
   PropertyListQuery,
   UpdatePropertyPayload,
+  UpdatePropertyVisibilityPayload,
 } from "./property.schema.js"
 
 const propertyInclude = {
   landlord: { select: { id: true, name: true } },
+  category: true,
+} satisfies Prisma.PropertyInclude
+
+const adminPropertyInclude = {
+  landlord: { select: { id: true, name: true, email: true, isBanned: true } },
   category: true,
 } satisfies Prisma.PropertyInclude
 
@@ -25,6 +33,7 @@ const getAllProperties = async (query: PropertyListQuery) => {
   const { page, limit, search, categoryId, minRent, maxRent, sort } = query
 
   const where: Prisma.PropertyWhereInput = {
+    ...visiblePropertyWhere,
     status: "AVAILABLE",
     ...(categoryId ? { categoryId } : {}),
     ...(minRent !== undefined || maxRent !== undefined
@@ -61,7 +70,10 @@ const getAllProperties = async (query: PropertyListQuery) => {
 }
 
 const getPropertyById = async (id: string) => {
-  const property = await prisma.property.findUnique({ where: { id }, include: propertyInclude })
+  const property = await prisma.property.findFirst({
+    where: { id, ...visiblePropertyWhere },
+    include: propertyInclude,
+  })
 
   if (!property) {
     throw new AppError(httpStatus.NOT_FOUND, "Property not found")
@@ -170,10 +182,54 @@ const deleteProperty = async (id: string, landlordId: string) => {
   await uploadService.deleteUnusedImages(existing.images)
 }
 
+const getAdminProperties = async (query: AdminPropertyListQuery) => {
+  const { page, limit, search, landlordId, status, isHidden } = query
+
+  const where: Prisma.PropertyWhereInput = {
+    ...(landlordId ? { landlordId } : {}),
+    ...(status ? { status } : {}),
+    ...(isHidden !== undefined ? { isHidden } : {}),
+    ...(search
+      ? {
+          OR: [
+            { name: { contains: search, mode: "insensitive" } },
+            { location: { contains: search, mode: "insensitive" } },
+            { description: { contains: search, mode: "insensitive" } },
+          ],
+        }
+      : {}),
+  }
+
+  const [properties, total] = await Promise.all([
+    prisma.property.findMany({
+      where,
+      include: adminPropertyInclude,
+      orderBy: { createdAt: "desc" },
+      skip: (page - 1) * limit,
+      take: limit,
+    }),
+    prisma.property.count({ where }),
+  ])
+
+  return { properties, meta: { page, limit, total } }
+}
+
+const updatePropertyVisibility = async (id: string, payload: UpdatePropertyVisibilityPayload) => {
+  const { count } = await prisma.property.updateMany({ where: { id }, data: payload })
+
+  if (count === 0) {
+    throw new AppError(httpStatus.NOT_FOUND, "Property not found")
+  }
+
+  return prisma.property.findUniqueOrThrow({ where: { id }, include: adminPropertyInclude })
+}
+
 export const propertyService = {
   getAllProperties,
   getPropertyById,
   createProperty,
   updateProperty,
   deleteProperty,
+  getAdminProperties,
+  updatePropertyVisibility,
 }
