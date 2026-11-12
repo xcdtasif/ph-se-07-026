@@ -4,7 +4,7 @@ import { logCount } from "./log-count.js"
 
 const SEED_PASSWORD = "1a2s3d4f"
 
-type SeedUser = { name: string; email: string }
+type SeedUser = { name: string; email: string; isBanned?: boolean }
 
 export const seedUsersWithRole = async (
   users: SeedUser[],

@@ -6,4 +6,11 @@ export const LANDLORDS = [
   { name: "Landlord 03", email: "landlord03@gmail.com" },
 ]
 
-export const seedLandlords = () => seedUsersWithRole(LANDLORDS, "LANDLORD", "landlord", "landlords")
+export const BANNED_LANDLORD = {
+  name: "Landlord 04",
+  email: "landlord04@gmail.com",
+  isBanned: true,
+}
+
+export const seedLandlords = () =>
+  seedUsersWithRole([...LANDLORDS, BANNED_LANDLORD], "LANDLORD", "landlord", "landlords")

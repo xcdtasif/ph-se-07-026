@@ -1,7 +1,7 @@
 import { prisma } from "../../lib/prisma.js"
 import { PLACEHOLDER_IMAGE_URL } from "../../modules/upload/upload.constants.js"
 import { logCount } from "../utils/log-count.js"
-import { LANDLORDS } from "./landlords.js"
+import { BANNED_LANDLORD, LANDLORDS } from "./landlords.js"
 
 type SeedProperty = {
   category: string
@@ -10,6 +10,10 @@ type SeedProperty = {
   location: string
   rent: number
   deposit: number
+  // Hidden by an admin
+  isHidden?: boolean
+  // Owned by the banned landlord instead of one of the active ones
+  bannedLandlord?: boolean
 }
 
 const PROPERTIES: SeedProperty[] = [
@@ -81,23 +85,56 @@ const PROPERTIES: SeedProperty[] = [
     rent: 65000,
     deposit: 195000,
   },
+  {
+    category: "Apartment",
+    name: "Penthouse with Skyline View in Mohakhali",
+    description:
+      "Top-floor penthouse with a private terrace, two lifts and a dedicated parking space.",
+    location: "Mohakhali DOHS, Dhaka",
+    rent: 95000,
+    deposit: 190000,
+    isHidden: true,
+  },
+  {
+    category: "Apartment",
+    name: "Garden-Facing Flat in Lalmatia",
+    description: "Quiet two-bedroom ground-floor flat with a small garden and a gated entrance.",
+    location: "Lalmatia, Dhaka",
+    rent: 30000,
+    deposit: 60000,
+    bannedLandlord: true,
+  },
 ]
 
 export const seedProperties = async () => {
-  const landlords = await prisma.user.findMany({
-    where: { email: { in: LANDLORDS.map((landlord) => landlord.email) }, role: "LANDLORD" },
-    orderBy: { email: "asc" },
+  const owners = await prisma.user.findMany({
+    where: {
+      email: { in: [...LANDLORDS, BANNED_LANDLORD].map(({ email }) => email) },
+      role: "LANDLORD",
+    },
+    select: { id: true, email: true },
   })
+  const ownerIds = new Map(owners.map(({ id, email }) => [email, id]))
 
-  if (landlords.length !== LANDLORDS.length) {
-    throw new Error("Seed landlords not found, seed users first")
+  const getOwnerId = (email: string) => {
+    const id = ownerIds.get(email)
+
+    if (!id) {
+      throw new Error("Seed landlords not found, seed users first")
+    }
+
+    return id
   }
+
+  // Properties rotate between the active landlords
+  const activeLandlordIds = LANDLORDS.map(({ email }) => getOwnerId(email))
+  const bannedLandlordId = getOwnerId(BANNED_LANDLORD.email)
 
   const categories = await prisma.category.findMany()
   const categoryIds = new Map(categories.map((category) => [category.name, category.id]))
 
   const existing = await prisma.property.findMany({
-    where: { landlordId: { in: landlords.map((landlord) => landlord.id) } },
+    where: { landlordId: { in: [...activeLandlordIds, bannedLandlordId] } },
     select: { name: true },
   })
   const existingNames = new Set(existing.map((property) => property.name))
@@ -110,7 +147,7 @@ export const seedProperties = async () => {
   }
 
   await prisma.property.createMany({
-    data: missing.map(({ category, ...property }, index) => {
+    data: missing.map(({ category, bannedLandlord, ...property }, index) => {
       const categoryId = categoryIds.get(category)
 
       if (!categoryId) {
@@ -119,7 +156,9 @@ export const seedProperties = async () => {
 
       return {
         ...property,
-        landlordId: landlords[index % landlords.length]!.id,
+        landlordId: bannedLandlord
+          ? bannedLandlordId
+          : activeLandlordIds[index % activeLandlordIds.length]!,
         categoryId,
         images: [PLACEHOLDER_IMAGE_URL],
       }
