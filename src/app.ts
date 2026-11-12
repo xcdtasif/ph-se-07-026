@@ -16,6 +16,9 @@ import { propertyRouter } from "./modules/property/property.routes.js"
 import { adminRequestRouter } from "./modules/request/request.admin.routes.js"
 import { landlordRequestRouter } from "./modules/request/request.landlord.routes.js"
 import { tenantRequestRouter } from "./modules/request/request.tenant.routes.js"
+import { adminReviewRouter } from "./modules/review/review.admin.routes.js"
+import { landlordReviewRouter } from "./modules/review/review.landlord.routes.js"
+import { reviewRouter } from "./modules/review/review.routes.js"
 import { tenantReviewRouter } from "./modules/review/review.tenant.routes.js"
 import { uploadRouter } from "./modules/upload/upload.routes.js"
 import { adminUserRouter } from "./modules/user/user.admin.routes.js"
@@ -54,6 +57,7 @@ app.use("/api/categories", categoryRouter)
 
 // Property
 app.use("/api/properties", propertyRouter)
+app.use("/api/properties", reviewRouter)
 app.use("/api/landlord/properties", landlordPropertyRouter)
 app.use("/api/admin/properties", adminPropertyRouter)
 
@@ -68,6 +72,8 @@ app.use("/api/stripe/webhook", stripeWebhookRouter)
 
 // Review
 app.use("/api/tenant/reviews", tenantReviewRouter)
+app.use("/api/landlord/reviews", landlordReviewRouter)
+app.use("/api/admin/reviews", adminReviewRouter)
 
 // Upload
 app.use("/api/uploadthing", uploadRouter)

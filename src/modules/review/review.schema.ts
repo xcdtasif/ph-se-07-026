@@ -1,5 +1,11 @@
 import z from "zod"
 
+export const propertyReviewsParamsSchema = z.strictObject({
+  propertyId: z.uuid(),
+})
+
+export type PropertyReviewsParams = z.output<typeof propertyReviewsParamsSchema>
+
 export const reviewIdParamsSchema = z.strictObject({
   id: z.uuid(),
 })
@@ -20,3 +26,26 @@ export const reviewListQuerySchema = z.strictObject({
 })
 
 export type ReviewListQuery = z.output<typeof reviewListQuerySchema>
+
+export const landlordReviewListQuerySchema = reviewListQuerySchema.extend({
+  propertyId: z.uuid().optional(),
+})
+
+export type LandlordReviewListQuery = z.output<typeof landlordReviewListQuerySchema>
+
+export const adminReviewListQuerySchema = reviewListQuerySchema.extend({
+  propertyId: z.uuid().optional(),
+  tenantId: z.uuid().optional(),
+  isHidden: z
+    .enum(["true", "false"])
+    .transform((value) => value === "true")
+    .optional(),
+})
+
+export type AdminReviewListQuery = z.output<typeof adminReviewListQuerySchema>
+
+export const updateReviewVisibilitySchema = z.strictObject({
+  isHidden: z.boolean(),
+})
+
+export type UpdateReviewVisibilityPayload = z.output<typeof updateReviewVisibilitySchema>

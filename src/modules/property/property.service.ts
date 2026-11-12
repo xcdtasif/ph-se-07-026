@@ -3,6 +3,7 @@ import httpStatus from "http-status"
 import type { Prisma, PropertyStatus } from "../../generated/prisma/client.js"
 import { prisma } from "../../lib/prisma.js"
 import { AppError } from "../../utils/app-error.js"
+import { reviewService } from "../review/review.service.js"
 import { uploadService } from "../upload/upload.service.js"
 import { visiblePropertyWhere } from "./property.filters.js"
 import type {
@@ -66,7 +67,12 @@ const getAllProperties = async (query: PropertyListQuery) => {
     prisma.property.count({ where }),
   ])
 
-  return { properties, meta: { page, limit, total } }
+  const summaryFor = await reviewService.getRatingSummaries(properties.map(({ id }) => id))
+
+  return {
+    properties: properties.map((property) => ({ ...property, ...summaryFor(property.id) })),
+    meta: { page, limit, total },
+  }
 }
 
 const getPropertyById = async (id: string) => {
@@ -79,7 +85,9 @@ const getPropertyById = async (id: string) => {
     throw new AppError(httpStatus.NOT_FOUND, "Property not found")
   }
 
-  return property
+  const summaryFor = await reviewService.getRatingSummaries([id])
+
+  return { ...property, ...summaryFor(id) }
 }
 
 const assertCategoryExists = async (categoryId: string) => {
