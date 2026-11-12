@@ -1,12 +1,19 @@
 # Payment
 
-| Group  | Base path              | Access           |
-| ------ | ---------------------- | ---------------- |
-| Tenant | `/api/tenant/payments` | Tenant           |
-| Stripe | `/api/stripe/webhook`  | Stripe signature |
-
 A tenant pays the property's `deposit` through Stripe Checkout after the landlord approves the
 request. The amount is charged in BDT (Stripe amounts are in paisa, so the deposit is multiplied by 100). Only card payments are accepted.
+
+## Endpoints
+
+`:name` is a path param, `?…` means query params and `{…}` means a request body. Details are in each section.
+
+| Name                                            | Endpoint                               | Access |
+| ----------------------------------------------- | -------------------------------------- | ------ |
+| [Create Payment](#create-payment)               | `POST /api/tenant/payments/create {…}` | Tenant |
+| [Get Own Payments](#get-own-payments)           | `GET /api/tenant/payments?…`           | Tenant |
+| [Get Own Payment By ID](#get-own-payment-by-id) | `GET /api/tenant/payments/:id`         | Tenant |
+
+The Stripe webhook is called by Stripe, not by clients. See [Stripe Webhook](#stripe-webhook).
 
 ## Payment object
 
@@ -56,8 +63,8 @@ While a checkout is in progress (a `PENDING` payment younger than 35 minutes):
 - Calling create again returns the same open `checkoutUrl` instead of a second session, so a tenant
   who closed the tab can come back to it. Simultaneous calls (a double click) are handled one at a
   time, so they also end up with one session.
-- The landlord cannot reject the `APPROVED` request, so a paid deposit always finds its request
-  still `APPROVED`.
+- The landlord cannot reject, and the tenant cannot cancel, the `APPROVED` request, so a paid
+  deposit always finds its request still `APPROVED`.
 
 The age check is what holds the lock, so it does not depend on a webhook arriving. The expired
 webhook only does the clean-up. Stripe retries failed deliveries for days, so a missed one is
@@ -103,9 +110,14 @@ The `201` response is a payment object with an extra `checkoutUrl` (the Stripe C
 | 404    | Request not found                     | `Request not found`                    |
 | 409    | Request is not `APPROVED`             | `Only an approved request can be paid` |
 | 409    | Checkout paid, webhook pending        | `Your payment is being processed`      |
+| 409    | Property hidden or landlord banned    | `Property is not available`            |
 | 429    | Stripe rate limit                     | `Payment provider is busy, try again`  |
 | 502    | Stripe rejected the request or failed | `Payment provider error`               |
 | 503    | Stripe unreachable                    | `Payment provider unavailable`         |
+
+A [hidden](property.md#visibility) property or a banned landlord blocks new checkouts, including
+reusing an open one. A checkout that was already created can still be paid, and its webhook is
+processed normally.
 
 ---
 
