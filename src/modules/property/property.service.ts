@@ -6,9 +6,11 @@ import { AppError } from "../../utils/app-error.js"
 import { reviewService } from "../review/review.service.js"
 import { uploadService } from "../upload/upload.service.js"
 import { visiblePropertyWhere } from "./property.filters.js"
+import { getOwnedProperty } from "./property.ownership.js"
 import type {
   AdminPropertyListQuery,
   CreatePropertyPayload,
+  LandlordPropertyListQuery,
   PropertyListQuery,
   UpdatePropertyPayload,
   UpdatePropertyVisibilityPayload,
@@ -30,6 +32,17 @@ const orderByMap: Record<PropertyListQuery["sort"], Prisma.PropertyOrderByWithRe
   RENT_DESC: { rent: "desc" },
 }
 
+const searchWhere = (search?: string): Prisma.PropertyWhereInput =>
+  search
+    ? {
+        OR: [
+          { name: { contains: search, mode: "insensitive" } },
+          { location: { contains: search, mode: "insensitive" } },
+          { description: { contains: search, mode: "insensitive" } },
+        ],
+      }
+    : {}
+
 const getAllProperties = async (query: PropertyListQuery) => {
   const { page, limit, search, categoryId, minRent, maxRent, sort } = query
 
@@ -45,15 +58,7 @@ const getAllProperties = async (query: PropertyListQuery) => {
           },
         }
       : {}),
-    ...(search
-      ? {
-          OR: [
-            { name: { contains: search, mode: "insensitive" } },
-            { location: { contains: search, mode: "insensitive" } },
-            { description: { contains: search, mode: "insensitive" } },
-          ],
-        }
-      : {}),
+    ...searchWhere(search),
   }
 
   const [properties, total] = await Promise.all([
@@ -96,20 +101,6 @@ const assertCategoryExists = async (categoryId: string) => {
   if (!category) {
     throw new AppError(httpStatus.NOT_FOUND, "Category not found")
   }
-}
-
-const getOwnedProperty = async (id: string, landlordId: string) => {
-  const property = await prisma.property.findUnique({ where: { id } })
-
-  if (!property) {
-    throw new AppError(httpStatus.NOT_FOUND, "Property not found")
-  }
-
-  if (property.landlordId !== landlordId) {
-    throw new AppError(httpStatus.FORBIDDEN, "You don't own this property")
-  }
-
-  return property
 }
 
 const createProperty = async (landlordId: string, payload: CreatePropertyPayload) => {
@@ -190,6 +181,35 @@ const deleteProperty = async (id: string, landlordId: string) => {
   await uploadService.deleteUnusedImages(existing.images)
 }
 
+const getLandlordProperties = async (landlordId: string, query: LandlordPropertyListQuery) => {
+  const { page, limit, search, status, isHidden } = query
+
+  const where: Prisma.PropertyWhereInput = {
+    landlordId,
+    ...(status ? { status } : {}),
+    ...(isHidden !== undefined ? { isHidden } : {}),
+    ...searchWhere(search),
+  }
+
+  const [properties, total] = await Promise.all([
+    prisma.property.findMany({
+      where,
+      include: propertyInclude,
+      orderBy: { createdAt: "desc" },
+      skip: (page - 1) * limit,
+      take: limit,
+    }),
+    prisma.property.count({ where }),
+  ])
+
+  const summaryFor = await reviewService.getRatingSummaries(properties.map(({ id }) => id))
+
+  return {
+    properties: properties.map((property) => ({ ...property, ...summaryFor(property.id) })),
+    meta: { page, limit, total },
+  }
+}
+
 const getAdminProperties = async (query: AdminPropertyListQuery) => {
   const { page, limit, search, landlordId, status, isHidden } = query
 
@@ -197,15 +217,7 @@ const getAdminProperties = async (query: AdminPropertyListQuery) => {
     ...(landlordId ? { landlordId } : {}),
     ...(status ? { status } : {}),
     ...(isHidden !== undefined ? { isHidden } : {}),
-    ...(search
-      ? {
-          OR: [
-            { name: { contains: search, mode: "insensitive" } },
-            { location: { contains: search, mode: "insensitive" } },
-            { description: { contains: search, mode: "insensitive" } },
-          ],
-        }
-      : {}),
+    ...searchWhere(search),
   }
 
   const [properties, total] = await Promise.all([
@@ -238,6 +250,7 @@ export const propertyService = {
   createProperty,
   updateProperty,
   deleteProperty,
+  getLandlordProperties,
   getAdminProperties,
   updatePropertyVisibility,
 }

@@ -6,6 +6,7 @@ import { sendResponse } from "../../utils/send-response.js"
 import type {
   AdminPropertyListQuery,
   CreatePropertyPayload,
+  LandlordPropertyListQuery,
   PropertyIdParams,
   PropertyListQuery,
   UpdatePropertyPayload,
@@ -81,6 +82,21 @@ const deleteProperty = async (req: Request<PropertyIdParams>, res: Response) => 
   })
 }
 
+const getLandlordProperties = async (req: Request, res: Response) => {
+  const { properties, meta } = await propertyService.getLandlordProperties(
+    getLandlordId(req),
+    req.query as unknown as LandlordPropertyListQuery,
+  )
+
+  sendResponse(res, {
+    success: true,
+    statusCode: httpStatus.OK,
+    message: "Properties fetched successfully",
+    data: properties,
+    meta,
+  })
+}
+
 const getAdminProperties = async (req: Request, res: Response) => {
   const { properties, meta } = await propertyService.getAdminProperties(
     req.query as unknown as AdminPropertyListQuery,
@@ -115,6 +131,7 @@ export const propertyController = {
   createProperty,
   updateProperty,
   deleteProperty,
+  getLandlordProperties,
   getAdminProperties,
   updatePropertyVisibility,
 }

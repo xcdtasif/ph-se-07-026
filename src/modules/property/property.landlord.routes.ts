@@ -6,6 +6,7 @@ import { validate } from "../../middlewares/validate.js"
 import { propertyController } from "./property.controller.js"
 import {
   createPropertySchema,
+  landlordPropertyListQuerySchema,
   propertyIdParamsSchema,
   updatePropertySchema,
 } from "./property.schema.js"
@@ -13,6 +14,13 @@ import {
 const router = Router()
 
 router.use(authenticate, authorize("LANDLORD"))
+
+// Get Own Properties
+router.get(
+  "/",
+  validate(landlordPropertyListQuerySchema, "query"),
+  propertyController.getLandlordProperties,
+)
 
 // Create Property
 router.post("/", validate(createPropertySchema, "body"), propertyController.createProperty)

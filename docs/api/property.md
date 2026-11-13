@@ -8,6 +8,7 @@
 | --------------------------------------------------------- | ---------------------------------------- | -------- |
 | [Get All Properties](#get-all-properties)                 | `GET /api/properties?…`                  | Public   |
 | [Get Property By ID](#get-property-by-id)                 | `GET /api/properties/:id`                | Public   |
+| [Get Own Properties](#get-own-properties)                 | `GET /api/landlord/properties?…`         | Landlord |
 | [Create Property](#create-property)                       | `POST /api/landlord/properties {…}`      | Landlord |
 | [Update Property](#update-property)                       | `PATCH /api/landlord/properties/:id {…}` | Landlord |
 | [Delete Property](#delete-property)                       | `DELETE /api/landlord/properties/:id`    | Landlord |
@@ -129,6 +130,43 @@ Returns a single property in any status, unless it is [hidden](#visibility). It 
 | 200    | Success                       | `Property fetched successfully` |
 | 400    | Validation failed             | `Validation of params failed`   |
 | 404    | Property not found, or hidden | `Property not found`            |
+
+---
+
+## Get Own Properties
+
+`GET /api/landlord/properties` · Landlord
+
+Returns a paginated list of the signed-in landlord's properties, newest first, in any status and
+including ones an admin has [hidden](#visibility). Each property has `isHidden`, `reviewCount` and
+`averageRating`.
+
+**Query**
+
+| Param      | Type    | Default | Rules                                                                        |
+| ---------- | ------- | ------- | ---------------------------------------------------------------------------- |
+| `page`     | integer | `1`     | Minimum 1                                                                    |
+| `limit`    | integer | `10`    | 1 to 50                                                                      |
+| `search`   | string  |         | 1 to 100 characters. Case-insensitive match on name, location or description |
+| `status`   | enum    |         | `AVAILABLE`, `UNAVAILABLE`, `RESERVED`, `RENTED`                             |
+| `isHidden` | boolean |         | `true` or `false`                                                            |
+
+**Example**
+
+```
+GET /api/landlord/properties?page=1&limit=10&status=AVAILABLE
+```
+
+**Responses**
+
+| Status | When              | Message                                |
+| ------ | ----------------- | -------------------------------------- |
+| 200    | Success           | `Properties fetched successfully`      |
+| 400    | Validation failed | `Validation of query failed`           |
+| 401    | Not signed in     | `Authentication required`              |
+| 403    | Not a landlord    | `You don't have permission to do this` |
+
+`meta` is `{ page, limit, total }`.
 
 ---
 

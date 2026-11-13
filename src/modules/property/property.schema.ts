@@ -75,6 +75,12 @@ export const adminPropertyListQuerySchema = z.strictObject({
 
 export type AdminPropertyListQuery = z.output<typeof adminPropertyListQuerySchema>
 
+export const landlordPropertyListQuerySchema = adminPropertyListQuerySchema.omit({
+  landlordId: true,
+})
+
+export type LandlordPropertyListQuery = z.output<typeof landlordPropertyListQuerySchema>
+
 export const updatePropertyVisibilitySchema = z.strictObject({
   isHidden: z.boolean(),
 })
