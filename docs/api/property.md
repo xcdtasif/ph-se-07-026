@@ -28,8 +28,8 @@
   "description": "Bright two-bedroom apartment with a balcony, close to the lake and public transport.",
   "location": "Dhanmondi, Dhaka",
   "images": [
-    "https://0j6bmu5elp.ufs.sh/f/sunny-2-bed-apartment-in-dhanmondi-1",
-    "https://0j6bmu5elp.ufs.sh/f/sunny-2-bed-apartment-in-dhanmondi-2"
+    "https://<appId>.ufs.sh/f/sunny-2-bed-apartment-in-dhanmondi-1",
+    "https://<appId>.ufs.sh/f/sunny-2-bed-apartment-in-dhanmondi-2"
   ],
   "rent": "28000",
   "deposit": "56000",
@@ -200,8 +200,8 @@ other host are rejected.
   "description": "Quiet one-bedroom apartment with natural light, near the metro station and local market.",
   "location": "Mirpur 10, Dhaka",
   "images": [
-    "https://0j6bmu5elp.ufs.sh/f/cozy-1-bed-apartment-in-mirpur-1",
-    "https://0j6bmu5elp.ufs.sh/f/cozy-1-bed-apartment-in-mirpur-2"
+    "https://<appId>.ufs.sh/f/cozy-1-bed-apartment-in-mirpur-1",
+    "https://<appId>.ufs.sh/f/cozy-1-bed-apartment-in-mirpur-2"
   ],
   "rent": 18500.5,
   "deposit": 37000

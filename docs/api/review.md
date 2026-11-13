@@ -31,7 +31,7 @@
     "id": "6f1c2d3e-0000-4000-8000-000000000000",
     "name": "Sunny 2-Bed Apartment in Dhanmondi",
     "location": "Dhanmondi, Dhaka",
-    "images": ["https://0j6bmu5elp.ufs.sh/f/sunny-2-bed-apartment-in-dhanmondi-1"]
+    "images": ["https://<appId>.ufs.sh/f/sunny-2-bed-apartment-in-dhanmondi-1"]
   }
 }
 ```
