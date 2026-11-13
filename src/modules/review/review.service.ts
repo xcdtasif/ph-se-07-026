@@ -4,6 +4,7 @@ import type { Prisma } from "../../generated/prisma/client.js"
 import { prisma } from "../../lib/prisma.js"
 import { AppError } from "../../utils/app-error.js"
 import { visiblePropertyWhere } from "../property/property.filters.js"
+import { getOwnedProperty } from "../property/property.ownership.js"
 import type {
   AdminReviewListQuery,
   CreateReviewPayload,
@@ -158,6 +159,10 @@ const getLandlordReviews = async (
   landlordId: string,
   { page, limit, propertyId }: LandlordReviewListQuery,
 ) => {
+  if (propertyId) {
+    await getOwnedProperty(propertyId, landlordId)
+  }
+
   const where: Prisma.ReviewWhereInput = {
     isHidden: false,
     property: { landlordId },

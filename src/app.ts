@@ -57,7 +57,6 @@ app.use("/api/categories", categoryRouter)
 
 // Property
 app.use("/api/properties", propertyRouter)
-app.use("/api/properties", reviewRouter)
 app.use("/api/landlord/properties", landlordPropertyRouter)
 app.use("/api/admin/properties", adminPropertyRouter)
 
@@ -71,6 +70,7 @@ app.use("/api/tenant/payments", tenantPaymentRouter)
 app.use("/api/stripe/webhook", stripeWebhookRouter)
 
 // Review
+app.use("/api/properties", reviewRouter)
 app.use("/api/tenant/reviews", tenantReviewRouter)
 app.use("/api/landlord/reviews", landlordReviewRouter)
 app.use("/api/admin/reviews", adminReviewRouter)
