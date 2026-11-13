@@ -167,6 +167,9 @@ validation rules and responses.
 | [Review](docs/api/review.md)     | Property reviews, tenant reviews, admin moderation   |
 | [Upload](docs/api/upload.md)     | Property image uploads through UploadThing           |
 
+To test the endpoints in Postman, import the [collection](docs/postman/ph-se-07-026.postman_collection.json)
+and follow the [setup guide](docs/postman/postman.md) for its variables and login steps.
+
 ### Conventions
 
 #### Authentication
@@ -272,6 +275,7 @@ src/
   lib/, utils/    Prisma, Stripe and UploadThing clients, helpers
 prisma/           Schema, models and migrations
 docs/api/         API documentation, one page per module
+docs/postman/     Postman collection and how to use it
 ```
 
 Routes are split by who may call them. `<name>.routes.ts` holds public or any-signed-in routes, and
