@@ -37,12 +37,12 @@ Creates an account and signs the user in (sets both auth cookies).
 
 **Body**
 
-| Field      | Type   | Rules                                                 |
-| ---------- | ------ | ----------------------------------------------------- |
-| `name`     | string | Trimmed, 2 to 100 characters                          |
-| `email`    | string | Valid email, trimmed and lowercased                   |
-| `password` | string | 8 to 72 characters (and at most 72 bytes)             |
-| `role`     | string | `LANDLORD` or `TENANT` (`ADMIN` cannot self-register) |
+| Field      | Type   | Rules                                                |
+| ---------- | ------ | ---------------------------------------------------- |
+| `name`     | string | Trimmed, 2 to 100 characters                         |
+| `email`    | string | Valid email, trimmed and lowercased                  |
+| `password` | string | 8 to 72 characters (and at most 72 bytes)            |
+| `role`     | string | `LANDLORD` or `TENANT` (`ADMIN` can't self-register) |
 
 **Example**
 
@@ -120,9 +120,9 @@ Issues a new access token and refresh token and sets both cookies.
 
 **Responses**
 
-| Status | When                             | Message                         |
-| ------ | -------------------------------- | ------------------------------- |
-| 200    | Success                          | `Tokens refreshed successfully` |
-| 401    | Missing or invalid refresh token | `Authentication required`       |
-| 401    | User no longer exists            | `User no longer exists`         |
-| 403    | Account is banned                | `Your account has been banned`  |
+| Status | When                             | Message                                  |
+| ------ | -------------------------------- | ---------------------------------------- |
+| 200    | Success                          | `Tokens refreshed successfully`          |
+| 401    | Missing or invalid refresh token | `Authentication required`                |
+| 401    | User no longer exists            | `Account not found, please log in again` |
+| 403    | Account is banned                | `Your account has been banned`           |

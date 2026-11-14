@@ -29,17 +29,17 @@ Users pick `TENANT` or `LANDLORD` when they register. Admins are created by the 
 
 A landlord can reject a `PENDING` or `APPROVED` request, and a tenant can cancel a `PENDING` or
 `APPROVED` one. If a checkout expires unpaid, the request is rejected and the property is freed.
-See [Request](docs/api/request.md) and [Payment](docs/api/payment.md) for the full rules.
+See [Request](docs/api-docs/request.md) and [Payment](docs/api-docs/payment.md) for the full rules.
 
 ### Moderation
 
 - **Ban**: locks a user out immediately and changes no data. A banned landlord's properties are
-  hidden from the public until they are unbanned. Admins cannot be banned.
+  hidden from the public until they're unbanned. Admins can't be banned.
 - **Hide**: an admin can hide a property or a review. A hidden property is removed from public
   reads and blocks new requests, approvals and checkouts. A hidden review is removed from public
   and landlord lists and from the rating summary.
 
-See [User](docs/api/user.md) and [Property](docs/api/property.md#visibility).
+See [User](docs/api-docs/user.md) and [Property](docs/api-docs/property.md#visibility).
 
 ## Tech stack
 
@@ -151,24 +151,25 @@ in Bashundhara", so the payment flow can be tried right away. The sample data is
 | `npm run lint`          | Lint the code and apply fixes                     |
 | `npm run stripe:listen` | Forward Stripe webhooks to the local server       |
 
-## API documentation
+## API docs
 
 Each module has its own page with an endpoint table, the object shape, and every request with its
 validation rules and responses.
 
-| Module                           | Covers                                               |
-| -------------------------------- | ---------------------------------------------------- |
-| [Auth](docs/api/auth.md)         | Register, login, logout, token refresh               |
-| [User](docs/api/user.md)         | Own profile, admin user list, ban and unban          |
-| [Category](docs/api/category.md) | Property categories                                  |
-| [Property](docs/api/property.md) | Public browse, landlord management, admin moderation |
-| [Request](docs/api/request.md)   | Rental requests for tenants, landlords and admins    |
-| [Payment](docs/api/payment.md)   | Deposit checkout, payment history, Stripe webhook    |
-| [Review](docs/api/review.md)     | Property reviews, tenant reviews, admin moderation   |
-| [Upload](docs/api/upload.md)     | Property image uploads through UploadThing           |
+| Module                                | Covers                                               |
+| ------------------------------------- | ---------------------------------------------------- |
+| [Auth](docs/api-docs/auth.md)         | Register, login, logout, token refresh               |
+| [User](docs/api-docs/user.md)         | Own profile, admin user list, ban and unban          |
+| [Category](docs/api-docs/category.md) | Property categories                                  |
+| [Property](docs/api-docs/property.md) | Public browse, landlord management, admin moderation |
+| [Request](docs/api-docs/request.md)   | Rental requests for tenants, landlords and admins    |
+| [Payment](docs/api-docs/payment.md)   | Deposit checkout, payment history, Stripe webhook    |
+| [Review](docs/api-docs/review.md)     | Property reviews, tenant reviews, admin moderation   |
+| [Upload](docs/api-docs/upload.md)     | Property image uploads through UploadThing           |
 
-To test the endpoints in Postman, import the [collection](docs/postman/ph-se-07-026.postman_collection.json)
-and follow the [setup guide](docs/postman/postman.md) for its variables and login steps.
+The endpoints are also published as
+[Postman docs](https://documenter.getpostman.com/view/55697110/2sBYHaPcqk). To run the requests
+against your own server, see the [Postman guide](docs/postman-guide.md).
 
 ### Conventions
 
@@ -183,7 +184,7 @@ Authentication uses two `httpOnly` cookies, set on register, login and refresh:
 
 Send requests with credentials (`credentials: "include"` in `fetch`). Protected routes return
 `401` when the cookie is missing, invalid or the user no longer exists, and `403` when the user
-is banned or their role is not allowed.
+is banned or their role isn't allowed.
 
 #### Response envelope
 
@@ -204,7 +205,7 @@ Every response, success or error, has this shape:
 }
 ```
 
-- `data` is omitted when there is nothing to return (for example, deletes).
+- `data` is omitted when there's nothing to return (for example, deletes).
 - `meta` is present on paginated lists only.
 - `errorDetails` is present on errors only.
 
@@ -259,7 +260,7 @@ Enum values are `UPPER_SNAKE_CASE`.
 ## Database
 
 Six models: `User`, `Category`, `Property`, `Request`, `Payment` and `Review`. See the
-[ERD](docs/generated/prisma-erd-generator/erd.svg). The schema is split by model in `prisma/models`,
+[ERD](docs/erd.svg). The schema is split by model in `prisma/models`,
 with migrations in `prisma/migrations`.
 
 ## Project structure
@@ -274,8 +275,7 @@ src/
   db/             Seed and delete scripts
   lib/, utils/    Prisma, Stripe and UploadThing clients, helpers
 prisma/           Schema, models and migrations
-docs/api/         API documentation, one page per module
-docs/postman/     Postman collection and how to use it
+docs/             API docs (api-docs/, one page per module), Postman guide and ERD
 ```
 
 Routes are split by who may call them. `<name>.routes.ts` holds public or any-signed-in routes, and

@@ -21,9 +21,9 @@ Banning sets `isBanned` and changes nothing else.
 - A banned user is locked out at once. Login, token refresh and every authenticated request return
   `403`, including requests that use an access token issued before the ban.
 - Their data stays as it is. A banned landlord's properties are hidden from the public list, from
-  [Get Property By ID](property.md#get-property-by-id) and from new requests, but are not changed.
+  [Get Property By ID](property.md#get-property-by-id) and from new requests, but aren't changed.
   Unbanning shows them again.
-- Admin accounts cannot be banned, so an admin cannot ban another admin or themselves.
+- Admin accounts can't be banned, so an admin can't ban another admin or themselves.
 
 ---
 
@@ -139,5 +139,5 @@ Bans or unbans a user. See [Banning](#banning).
 | 400    | Validation failed    | `Validation of params failed` or `Validation of body failed` |
 | 401    | Not signed in        | `Authentication required`                                    |
 | 403    | Not an admin         | `You don't have permission to do this`                       |
-| 403    | The user is an admin | `Admin accounts cannot be banned`                            |
+| 403    | The user is an admin | `Admin accounts can't be banned`                             |
 | 404    | User not found       | `User not found`                                             |

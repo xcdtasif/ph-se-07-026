@@ -64,8 +64,8 @@ is written when a landlord is banned, so unbanning shows the properties again.
 | ------------------------------------------------------ | ---------------------------------- |
 | Public list, get by ID, and [reviews](review.md)       | Not shown, `404` for a single read |
 | Create a request                                       | `404 Property not found`           |
-| Landlord approves a `PENDING` request                  | `409 Property is not available`    |
-| Tenant creates or reuses a checkout                    | `409 Property is not available`    |
+| Landlord approves a `PENDING` request                  | `409 Property isn't available`     |
+| Tenant creates or reuses a checkout                    | `409 Property isn't available`     |
 | Landlord rejects or completes, tenant cancels          | Allowed                            |
 | Stripe webhook for a checkout that was already created | Processed normally                 |
 
@@ -76,7 +76,7 @@ is written when a landlord is banned, so unbanning shows the properties again.
 `GET /api/properties` · Public
 
 Returns a paginated list of properties. Only `AVAILABLE` properties are listed, and only those that
-are not [hidden](#visibility). Each property includes `reviewCount` and `averageRating`.
+aren't [hidden](#visibility). Each property includes `reviewCount` and `averageRating`.
 
 **Query**
 
@@ -114,7 +114,7 @@ is the number of properties matching the filters.
 
 `GET /api/properties/:id` · Public
 
-Returns a single property in any status, unless it is [hidden](#visibility). It includes
+Returns a single property in any status, unless it's [hidden](#visibility). It includes
 `reviewCount` and `averageRating`.
 
 **Params**
@@ -210,13 +210,13 @@ other host are rejected.
 
 **Responses**
 
-| Status | When                    | Message                                |
-| ------ | ----------------------- | -------------------------------------- |
-| 201    | Success                 | `Property created successfully`        |
-| 400    | Validation failed       | `Validation of body failed`            |
-| 401    | Not signed in           | `Authentication required`              |
-| 403    | Not a landlord          | `You don't have permission to do this` |
-| 404    | Category does not exist | `Category not found`                   |
+| Status | When                   | Message                                |
+| ------ | ---------------------- | -------------------------------------- |
+| 201    | Success                | `Property created successfully`        |
+| 400    | Validation failed      | `Validation of body failed`            |
+| 401    | Not signed in          | `Authentication required`              |
+| 403    | Not a landlord         | `You don't have permission to do this` |
+| 404    | Category doesn't exist | `Category not found`                   |
 
 ---
 
@@ -250,17 +250,17 @@ Partial update. Send at least one field.
 - `AVAILABLE` → `UNAVAILABLE` hides the property and rejects all its `PENDING` requests in the same
   transaction.
 - `UNAVAILABLE` → `AVAILABLE` is allowed at any time.
-- A `RESERVED` or `RENTED` property (one with an `APPROVED` or `ACTIVE` request) cannot have its
+- A `RESERVED` or `RENTED` property (one with an `APPROVED` or `ACTIVE` request) can't have its
   status changed. Reject the `APPROVED` request or complete the `ACTIVE` one first.
 
 **Images**
 
-`images` replaces the whole list. Files that were in the old list and are not in the new one are
+`images` replaces the whole list. Files that were in the old list and aren't in the new one are
 deleted from UploadThing, unless another property still uses them.
 
 **Reserved properties**
 
-A `RESERVED` property cannot be edited at all, so the deposit a tenant is about to pay cannot change.
+A `RESERVED` property can't be edited at all, so the deposit a tenant is about to pay can't change.
 A `RENTED` property can still be edited, except for its `status`.
 
 **Example**
@@ -282,8 +282,8 @@ A `RENTED` property can still be edited, except for its `status`.
 | 403    | Not a landlord                                         | `You don't have permission to do this`                       |
 | 403    | Property belongs to another landlord                   | `You don't own this property`                                |
 | 404    | Property or category not found                         | `Property not found` or `Category not found`                 |
-| 409    | Changing `status` of a `RESERVED` or `RENTED` property | `Cannot change the status of a reserved or rented property`  |
-| 409    | Editing a `RESERVED` property                          | `Cannot update a reserved property`                          |
+| 409    | Changing `status` of a `RESERVED` or `RENTED` property | `Can't change the status of a reserved or rented property`   |
+| 409    | Editing a `RESERVED` property                          | `Can't update a reserved property`                           |
 
 ---
 
@@ -301,15 +301,15 @@ The property's images are deleted from UploadThing, unless another property stil
 
 **Responses**
 
-| Status | When                                 | Message                                                                   |
-| ------ | ------------------------------------ | ------------------------------------------------------------------------- |
-| 200    | Success                              | `Property deleted successfully`                                           |
-| 400    | Validation failed                    | `Validation of params failed`                                             |
-| 401    | Not signed in                        | `Authentication required`                                                 |
-| 403    | Not a landlord                       | `You don't have permission to do this`                                    |
-| 403    | Property belongs to another landlord | `You don't own this property`                                             |
-| 404    | Property not found                   | `Property not found`                                                      |
-| 409    | Property has any requests            | `Cannot delete a property that has requests, mark it unavailable instead` |
+| Status | When                                 | Message                                                                  |
+| ------ | ------------------------------------ | ------------------------------------------------------------------------ |
+| 200    | Success                              | `Property deleted successfully`                                          |
+| 400    | Validation failed                    | `Validation of params failed`                                            |
+| 401    | Not signed in                        | `Authentication required`                                                |
+| 403    | Not a landlord                       | `You don't have permission to do this`                                   |
+| 403    | Property belongs to another landlord | `You don't own this property`                                            |
+| 404    | Property not found                   | `Property not found`                                                     |
+| 409    | Property has any requests            | `Can't delete a property that has requests, mark it unavailable instead` |
 
 ---
 
@@ -356,7 +356,7 @@ GET /api/admin/properties?page=1&limit=10&isHidden=true
 `PATCH /api/admin/properties/:id` · Admin
 
 Hides or unhides a property. A hidden property follows the [visibility](#visibility) rules. Its
-`status` is not changed, its `PENDING` requests are not rejected, and the landlord cannot undo it.
+`status` isn't changed, its `PENDING` requests aren't rejected, and the landlord can't undo it.
 
 **Body**
 

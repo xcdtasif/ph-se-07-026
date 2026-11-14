@@ -100,7 +100,7 @@ Returns all categories sorted by name (A to Z). Not paginated.
 | 400    | Validation failed                     | `Validation of params failed` or `Validation of body failed` |
 | 401    | Not signed in                         | `Authentication required`                                    |
 | 403    | Not an admin                          | `You don't have permission to do this`                       |
-| 404    | Category does not exist               | `Resource not found`                                         |
+| 404    | Category doesn't exist                | `Category not found`                                         |
 | 409    | Name already used by another category | `Category already exists`                                    |
 
 ---
@@ -117,11 +117,11 @@ Returns all categories sorted by name (A to Z). Not paginated.
 
 **Responses**
 
-| Status | When                          | Message                                        |
-| ------ | ----------------------------- | ---------------------------------------------- |
-| 200    | Success                       | `Category deleted successfully`                |
-| 400    | Validation failed             | `Validation of params failed`                  |
-| 401    | Not signed in                 | `Authentication required`                      |
-| 403    | Not an admin                  | `You don't have permission to do this`         |
-| 404    | Category does not exist       | `Category not found`                           |
-| 409    | Category still has properties | `Cannot delete a category that has properties` |
+| Status | When                          | Message                                       |
+| ------ | ----------------------------- | --------------------------------------------- |
+| 200    | Success                       | `Category deleted successfully`               |
+| 400    | Validation failed             | `Validation of params failed`                 |
+| 401    | Not signed in                 | `Authentication required`                     |
+| 403    | Not an admin                  | `You don't have permission to do this`        |
+| 404    | Category doesn't exist        | `Category not found`                          |
+| 409    | Category still has properties | `Can't delete a category that has properties` |

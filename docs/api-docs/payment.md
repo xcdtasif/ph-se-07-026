@@ -51,7 +51,7 @@ The Stripe webhook is called by Stripe, not by clients. See [Stripe Webhook](#st
    - the payment becomes `COMPLETED`
    - the request becomes `ACTIVE` and the property becomes `RENTED`
    - every other `PENDING` request on that property becomes `REJECTED`
-4. A session lives for 35 minutes. If the tenant does not pay in time, Stripe sends
+4. A session lives for 35 minutes. If the tenant doesn't pay in time, Stripe sends
    `checkout.session.expired`, and in one transaction:
    - the payment becomes `FAILED`
    - the request becomes `REJECTED` and the property becomes `AVAILABLE` again
@@ -63,10 +63,10 @@ While a checkout is in progress (a `PENDING` payment younger than 35 minutes):
 - Calling create again returns the same open `checkoutUrl` instead of a second session, so a tenant
   who closed the tab can come back to it. Simultaneous calls (a double click) are handled one at a
   time, so they also end up with one session.
-- The landlord cannot reject, and the tenant cannot cancel, the `APPROVED` request, so a paid
+- The landlord can't reject, and the tenant can't cancel, the `APPROVED` request, so a paid
   deposit always finds its request still `APPROVED`.
 
-The age check is what holds the lock, so it does not depend on a webhook arriving. The expired
+The age check is what holds the lock, so it doesn't depend on a webhook arriving. The expired
 webhook only does the clean-up. Stripe retries failed deliveries for days, so a missed one is
 processed later. If a late "expired" webhook arrives for an old session while the request has a
 newer checkout, it marks that payment `FAILED` and leaves the request alone.
@@ -108,9 +108,9 @@ The `201` response is a payment object with an extra `checkoutUrl` (the Stripe C
 | 403    | Not a tenant                          | `You don't have permission to do this` |
 | 403    | Request belongs to someone            | `This request isn't yours`             |
 | 404    | Request not found                     | `Request not found`                    |
-| 409    | Request is not `APPROVED`             | `Only an approved request can be paid` |
+| 409    | Request isn't `APPROVED`              | `Only an approved request can be paid` |
 | 409    | Checkout paid, webhook pending        | `Your payment is being processed`      |
-| 409    | Property hidden or landlord banned    | `Property is not available`            |
+| 409    | Property hidden or landlord banned    | `Property isn't available`             |
 | 429    | Stripe rate limit                     | `Payment provider is busy, try again`  |
 | 502    | Stripe rejected the request or failed | `Payment provider error`               |
 | 503    | Stripe unreachable                    | `Payment provider unavailable`         |
@@ -195,4 +195,4 @@ To receive events locally, run `npm run stripe:listen` and copy the printed sign
 | ------ | ------------------------ | -------------------------------- |
 | 200    | Success                  | `Webhook processed successfully` |
 | 400    | Missing signature header | `Invalid webhook request`        |
-| 400    | Signature does not match | `Invalid webhook signature`      |
+| 400    | Signature doesn't match  | `Invalid webhook signature`      |

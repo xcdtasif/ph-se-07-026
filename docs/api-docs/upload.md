@@ -25,7 +25,7 @@ returned URLs on a property.
 | Max files | 2 per upload            |
 | Access    | Signed-in landlord only |
 
-Upload landscape images with a 3:2 aspect ratio (for example 1200 x 800). The API does not enforce
+Upload landscape images with a 3:2 aspect ratio (for example 1200 x 800). The API doesn't enforce
 the ratio, so crop on the client before uploading.
 
 ## UploadThing callback

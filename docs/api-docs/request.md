@@ -62,22 +62,22 @@ Rules that follow from this:
 - A property has at most one `APPROVED` or `ACTIVE` request, because approving needs an
   `AVAILABLE` property and holds it as `RESERVED`.
 - A tenant can only create a request for an `AVAILABLE` property, so `RESERVED`, `RENTED` and
-  `UNAVAILABLE` properties cannot be requested.
-- `RESERVED` means the deposit is pending. If the tenant does not pay, the property is freed in
+  `UNAVAILABLE` properties can't be requested.
+- `RESERVED` means the deposit is pending. If the tenant doesn't pay, the property is freed in
   one of two ways: the landlord rejects the `APPROVED` request, or, once a checkout was started
   and expired unpaid, the Stripe webhook rejects it.
 - `APPROVED` → `ACTIVE` is made by the Stripe webhook when the deposit is paid. It has no landlord
-  or tenant endpoint, so the landlord `PATCH` cannot set `ACTIVE`. The webhook also moves every
+  or tenant endpoint, so the landlord `PATCH` can't set `ACTIVE`. The webhook also moves every
   other `PENDING` request on that property to `REJECTED`. Requests are never deleted.
-- A landlord can toggle a property between `AVAILABLE` and `UNAVAILABLE`, and only while it is
-  not `RESERVED` or `RENTED` (no `APPROVED` or `ACTIVE` request). Hiding a property rejects all its
+- A landlord can toggle a property between `AVAILABLE` and `UNAVAILABLE`, and only while it isn't
+  `RESERVED` or `RENTED` (no `APPROVED` or `ACTIVE` request). Hiding a property rejects all its
   `PENDING` requests. To free a `RESERVED` property, reject its request.
-- A tenant can cancel a `PENDING` or `APPROVED` request. Cancelling an `ACTIVE` request is not
-  possible. A cancelled request does not count as open, so the tenant can request the property again.
-- A landlord cannot reject, and a tenant cannot cancel, an `APPROVED` request while its tenant has a
+- A tenant can cancel a `PENDING` or `APPROVED` request. Cancelling an `ACTIVE` request isn't
+  possible. A cancelled request doesn't count as open, so the tenant can request the property again.
+- A landlord can't reject, and a tenant can't cancel, an `APPROVED` request while its tenant has a
   checkout in progress (a `PENDING` payment younger than 35 minutes). The request returns to normal
   once the checkout is paid or expires.
-- A request cannot be created or approved for a [hidden](property.md#visibility) property or one
+- A request can't be created or approved for a [hidden](property.md#visibility) property or one
   whose landlord is banned. Rejecting and cancelling stay allowed, so such a request can always be
   ended.
 - Each status change and its property change are applied in one transaction, so both succeed or
@@ -91,10 +91,10 @@ Rules that follow from this:
 
 **Body**
 
-| Field        | Type   | Rules                                              |
-| ------------ | ------ | -------------------------------------------------- |
-| `propertyId` | UUID   | Must be an `AVAILABLE` property that is not hidden |
-| `message`    | string | Trimmed, 10 to 1000 characters                     |
+| Field        | Type   | Rules                                             |
+| ------------ | ------ | ------------------------------------------------- |
+| `propertyId` | UUID   | Must be an `AVAILABLE` property that isn't hidden |
+| `message`    | string | Trimmed, 10 to 1000 characters                    |
 
 A tenant can have only one `PENDING`, `APPROVED` or `ACTIVE` request per property.
 
@@ -116,7 +116,7 @@ A tenant can have only one `PENDING`, `APPROVED` or `ACTIVE` request per propert
 | 401    | Not signed in                | `Authentication required`                            |
 | 403    | Not a tenant                 | `You don't have permission to do this`               |
 | 404    | Property not found or hidden | `Property not found`                                 |
-| 409    | Property is not `AVAILABLE`  | `Property is not available`                          |
+| 409    | Property isn't `AVAILABLE`   | `Property isn't available`                           |
 | 409    | Open request already exists  | `You already have an open request for this property` |
 
 ---
@@ -181,7 +181,7 @@ GET /api/tenant/requests?page=1&limit=10&status=PENDING
 | -------- | ---- | ----------------------------------------- |
 | `status` | enum | `CANCELLED`, from `PENDING` or `APPROVED` |
 
-Cancelling an `APPROVED` request sets its property from `RESERVED` back to `AVAILABLE`. It is
+Cancelling an `APPROVED` request sets its property from `RESERVED` back to `AVAILABLE`. It's
 allowed even when the property is hidden or its landlord is banned.
 
 **Example**
@@ -194,17 +194,17 @@ allowed even when the property is hidden or its landlord is banned.
 
 **Responses**
 
-| Status | When                                               | Message                                                         |
-| ------ | -------------------------------------------------- | --------------------------------------------------------------- |
-| 200    | Success                                            | `Request cancelled successfully`                                |
-| 400    | Validation failed                                  | `Validation of params failed` or `Validation of body failed`    |
-| 401    | Not signed in                                      | `Authentication required`                                       |
-| 403    | Not a tenant                                       | `You don't have permission to do this`                          |
-| 403    | Request belongs to another tenant                  | `This request isn't yours`                                      |
-| 404    | Request not found                                  | `Request not found`                                             |
-| 409    | Request is not `PENDING` or `APPROVED`             | `Cannot change a <FROM> request to CANCELLED`                   |
-| 409    | Status changed concurrently                        | `Request status has changed, please retry`                      |
-| 409    | Cancelling an `APPROVED` request during a checkout | `You are paying the deposit, try again after the checkout ends` |
+| Status | When                                               | Message                                                        |
+| ------ | -------------------------------------------------- | -------------------------------------------------------------- |
+| 200    | Success                                            | `Request cancelled successfully`                               |
+| 400    | Validation failed                                  | `Validation of params failed` or `Validation of body failed`   |
+| 401    | Not signed in                                      | `Authentication required`                                      |
+| 403    | Not a tenant                                       | `You don't have permission to do this`                         |
+| 403    | Request belongs to another tenant                  | `This request isn't yours`                                     |
+| 404    | Request not found                                  | `Request not found`                                            |
+| 409    | Request isn't `PENDING` or `APPROVED`              | `Can't change a <FROM> request to CANCELLED`                   |
+| 409    | Status changed concurrently                        | `Request status has changed, please retry`                     |
+| 409    | Cancelling an `APPROVED` request during a checkout | `You're paying the deposit, try again after the checkout ends` |
 
 ---
 
@@ -252,18 +252,18 @@ GET /api/landlord/requests?page=1&limit=10&status=PENDING
 
 **Responses**
 
-| Status | When                                                     | Message                                                                             |
-| ------ | -------------------------------------------------------- | ----------------------------------------------------------------------------------- |
-| 200    | Success                                                  | `Request status updated successfully`                                               |
-| 400    | Validation failed                                        | `Validation of params failed` or `Validation of body failed`                        |
-| 401    | Not signed in                                            | `Authentication required`                                                           |
-| 403    | Not a landlord                                           | `You don't have permission to do this`                                              |
-| 403    | Property belongs to another landlord                     | `This request isn't for your property`                                              |
-| 404    | Request not found                                        | `Request not found`                                                                 |
-| 409    | Property is not in the required status (see table above) | `Property is not available`, `Property is not reserved` or `Property is not rented` |
-| 409    | Transition not allowed                                   | `Cannot change a <FROM> request to <TO>`                                            |
-| 409    | Status changed concurrently                              | `Request status has changed, please retry`                                          |
-| 409    | Rejecting an `APPROVED` request during a checkout        | `The tenant is paying the deposit, try again after the checkout ends`               |
+| Status | When                                                    | Message                                                                          |
+| ------ | ------------------------------------------------------- | -------------------------------------------------------------------------------- |
+| 200    | Success                                                 | `Request status updated successfully`                                            |
+| 400    | Validation failed                                       | `Validation of params failed` or `Validation of body failed`                     |
+| 401    | Not signed in                                           | `Authentication required`                                                        |
+| 403    | Not a landlord                                          | `You don't have permission to do this`                                           |
+| 403    | Property belongs to another landlord                    | `This request isn't for your property`                                           |
+| 404    | Request not found                                       | `Request not found`                                                              |
+| 409    | Property isn't in the required status (see table above) | `Property isn't available`, `Property isn't reserved` or `Property isn't rented` |
+| 409    | Transition not allowed                                  | `Can't change a <FROM> request to <TO>`                                          |
+| 409    | Status changed concurrently                             | `Request status has changed, please retry`                                       |
+| 409    | Rejecting an `APPROVED` request during a checkout       | `The tenant is paying the deposit, try again after the checkout ends`            |
 
 ---
 
@@ -272,7 +272,7 @@ GET /api/landlord/requests?page=1&limit=10&status=PENDING
 `GET /api/admin/requests` · Admin
 
 Returns a paginated list of all requests, newest first. Each request includes the `tenant` and
-`property` objects, as in the landlord view. Admins cannot change a request's status.
+`property` objects, as in the landlord view. Admins can't change a request's status.
 
 **Query**
 

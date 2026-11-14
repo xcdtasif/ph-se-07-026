@@ -41,11 +41,11 @@
 - A review belongs to one request, so a tenant can review a rental only once.
 - A request can be reviewed only when its status is `COMPLETED`.
 - `propertyId` is taken from the request, not from the body.
-- Reviews cannot be edited or deleted by the tenant.
+- Reviews can't be edited or deleted by the tenant.
 - An admin can hide a review with `isHidden`. A hidden review is left out of the public and landlord
   lists and of the property's `reviewCount` and `averageRating`. The tenant still sees it in their own
   reviews with `isHidden: true`.
-- Hiding does not free the request's review slot, so the tenant cannot post a replacement.
+- Hiding doesn't free the request's review slot, so the tenant can't post a replacement.
 
 ### Shapes
 
@@ -61,7 +61,7 @@
 
 `GET /api/properties/:propertyId/reviews` · Public
 
-Returns a property's visible reviews, newest first. A property that is
+Returns a property's visible reviews, newest first. A property that's
 [hidden](property.md#visibility), or whose landlord is banned, returns `404`.
 
 **Query**
@@ -121,7 +121,7 @@ GET /api/properties/6f1c2d3e-0000-4000-8000-000000000000/reviews?page=1&limit=10
 | 403    | Not a tenant               | `You don't have permission to do this`   |
 | 403    | Request belongs to another | `This request isn't yours`               |
 | 404    | Request not found          | `Request not found`                      |
-| 409    | Request is not `COMPLETED` | `You can only review a completed rental` |
+| 409    | Request isn't `COMPLETED`  | `You can only review a completed rental` |
 | 409    | Request already reviewed   | `You already reviewed this rental`       |
 
 ---
