@@ -68,7 +68,7 @@ const landlordTransitions: Transitions = {
   },
 }
 
-// A tenant cannot have more than one of these open for the same property
+// A tenant can't have more than one of these open for the same property
 const openStatuses: RequestStatus[] = ["PENDING", "APPROVED", "ACTIVE"]
 
 const paginate = ({ page, limit }: RequestListQuery) => ({
@@ -86,7 +86,7 @@ const createRequest = async (tenantId: string, payload: CreateRequestPayload) =>
   }
 
   if (property.status !== "AVAILABLE") {
-    throw new AppError(httpStatus.CONFLICT, "Property is not available")
+    throw new AppError(httpStatus.CONFLICT, "Property isn't available")
   }
 
   const openRequest = await prisma.request.findFirst({
@@ -168,16 +168,13 @@ const transitionRequest = <T>(
   const allowed = transitions[request.status]
 
   if (!allowed || !(status in allowed)) {
-    throw new AppError(
-      httpStatus.CONFLICT,
-      `Cannot change a ${request.status} request to ${status}`,
-    )
+    throw new AppError(httpStatus.CONFLICT, `Can't change a ${request.status} request to ${status}`)
   }
 
   const propertyChange = allowed[status]
 
   return prisma.$transaction(async (tx) => {
-    // Guard on the status we validated so a concurrent change cannot be overwritten
+    // Guard on the status we validated so a concurrent change can't be overwritten
     const { count } = await tx.request.updateMany({
       where: { id: request.id, status: request.status },
       data: { status },
@@ -189,7 +186,7 @@ const transitionRequest = <T>(
 
     /*
     Checked after the update above has locked the request row. Creating a payment holds the same
-    lock until its payment is inserted, so ending an approved request and a new checkout cannot
+    lock until its payment is inserted, so ending an approved request and a new checkout can't
     both succeed.
     */
     if (request.status === "APPROVED") {
@@ -213,7 +210,7 @@ const transitionRequest = <T>(
       if (propertyCount === 0) {
         throw new AppError(
           httpStatus.CONFLICT,
-          `Property is not ${propertyChange.from.toLowerCase()}`,
+          `Property isn't ${propertyChange.from.toLowerCase()}`,
         )
       }
     }
@@ -241,7 +238,7 @@ const updateTenantRequestStatus = async (
     request,
     status,
     tenantTransitions,
-    "You are paying the deposit, try again after the checkout ends",
+    "You're paying the deposit, try again after the checkout ends",
     (tx) => tx.request.findUniqueOrThrow({ where: { id }, include: tenantRequestInclude }),
   )
 }

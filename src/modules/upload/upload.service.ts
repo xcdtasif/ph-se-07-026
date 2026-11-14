@@ -4,7 +4,7 @@ import { PLACEHOLDER_IMAGE_URL } from "./upload.constants.js"
 
 /*
 Deletes the given image files from UploadThing, skipping the shared placeholder image, files
-that are not ours and files another property still uses, since a landlord can attach any
+that aren't ours and files another property still uses, since a landlord can attach any
 public UploadThing URL. Runs after the database write and is best effort, so a failure here
 leaves an orphaned file instead of failing the request.
 */

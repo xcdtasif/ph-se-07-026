@@ -53,7 +53,7 @@ const deleteCategory = async (id: string) => {
   }
 
   if (category._count.properties > 0) {
-    throw new AppError(httpStatus.CONFLICT, "Cannot delete a category that has properties")
+    throw new AppError(httpStatus.CONFLICT, "Can't delete a category that has properties")
   }
 
   await prisma.category.delete({ where: { id } })

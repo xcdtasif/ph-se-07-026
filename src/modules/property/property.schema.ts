@@ -55,7 +55,7 @@ export const propertyListQuerySchema = z
     sort: z.enum(["NEWEST", "RENT_ASC", "RENT_DESC"]).default("NEWEST"),
   })
   .refine((q) => q.minRent === undefined || q.maxRent === undefined || q.minRent <= q.maxRent, {
-    message: "minRent cannot be greater than maxRent",
+    message: "minRent can't be greater than maxRent",
     path: ["minRent"],
   })
 

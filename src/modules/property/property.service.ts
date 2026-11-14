@@ -115,9 +115,9 @@ const updateProperty = async (id: string, landlordId: string, payload: UpdatePro
   const data = payload as Prisma.PropertyUncheckedUpdateManyInput
 
   /*
-  RESERVED holds the property for a tenant's deposit, so it cannot be edited at all, and RENTED
-  cannot change status. Both are held by the request flow. Checked in the write itself so a
-  concurrent approval cannot be overwritten.
+  RESERVED holds the property for a tenant's deposit, so it can't be edited at all, and RENTED
+  can't change status. Both are held by the request flow. Checked in the write itself so a
+  concurrent approval can't be overwritten.
   */
   const lockedStatuses: PropertyStatus[] = payload.status ? ["RESERVED", "RENTED"] : ["RESERVED"]
 
@@ -131,8 +131,8 @@ const updateProperty = async (id: string, landlordId: string, payload: UpdatePro
       throw new AppError(
         httpStatus.CONFLICT,
         payload.status
-          ? "Cannot change the status of a reserved or rented property"
-          : "Cannot update a reserved property",
+          ? "Can't change the status of a reserved or rented property"
+          : "Can't update a reserved property",
       )
     }
 
@@ -165,7 +165,7 @@ const deleteProperty = async (id: string, landlordId: string) => {
   if (requestCount > 0) {
     throw new AppError(
       httpStatus.CONFLICT,
-      "Cannot delete a property that has requests, mark it unavailable instead",
+      "Can't delete a property that has requests, mark it unavailable instead",
     )
   }
 

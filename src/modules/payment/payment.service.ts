@@ -68,7 +68,7 @@ const createPayment = async (
         })
 
         if (isVisible === 0) {
-          throw new AppError(httpStatus.CONFLICT, "Property is not available")
+          throw new AppError(httpStatus.CONFLICT, "Property isn't available")
         }
 
         // Reuse the open checkout so a tenant who closed the tab has only one payable session
@@ -88,7 +88,7 @@ const createPayment = async (
           }
 
           /*
-          Paid, but the webhook has not activated the request yet. A new session would be
+          Paid, but the webhook hasn't activated the request yet. A new session would be
           payable too.
           */
           if (activeSession.status === "complete") {
@@ -122,7 +122,7 @@ const createPayment = async (
         createdSessionIds.push(session.id)
 
         if (!session.url) {
-          throw new AppError(httpStatus.BAD_GATEWAY, "Could not create a checkout session")
+          throw new AppError(httpStatus.BAD_GATEWAY, "Couldn't create a checkout session")
         }
 
         const payment = await tx.payment.create({
@@ -147,7 +147,7 @@ const createPayment = async (
 
 /*
 Marks the payment COMPLETED and activates the request, rents the property, and rejects the
-other pending requests for it. Stripe retries webhooks, so a payment that is no longer
+other pending requests for it. Stripe retries webhooks, so a payment that's no longer
 PENDING is skipped.
 */
 const completePayment = async (stripeSessionId: string) => {

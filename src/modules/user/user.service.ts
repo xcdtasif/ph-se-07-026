@@ -48,10 +48,10 @@ const updateUserStatus = async (id: string, payload: UpdateUserStatusPayload) =>
 
   /*
   Admins can never be banned, which also stops an admin from banning themselves. A role never
-  changes after registration, so this check cannot race with the update below.
+  changes after registration, so this check can't race with the update below.
   */
   if (user.role === "ADMIN") {
-    throw new AppError(httpStatus.FORBIDDEN, "Admin accounts cannot be banned")
+    throw new AppError(httpStatus.FORBIDDEN, "Admin accounts can't be banned")
   }
 
   return prisma.user.update({ where: { id }, data: payload, omit: { password: true } })

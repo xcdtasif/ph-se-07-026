@@ -116,7 +116,7 @@ export const seedRequests = async () => {
         },
       })
 
-      // There is no Stripe session behind these payments, they only show a paid deposit
+      // There's no Stripe session behind these payments, they only show a paid deposit
       if (seedRequest.status === "COMPLETED") {
         await tx.payment.create({
           data: {
