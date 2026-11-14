@@ -15,7 +15,7 @@
 | [Get All Properties (Admin)](#get-all-properties-admin)   | `GET /api/admin/properties?…`            | Admin    |
 | [Update Property Visibility](#update-property-visibility) | `PATCH /api/admin/properties/:id {…}`    | Admin    |
 
-## Property object
+## Property Object
 
 `rent` and `deposit` are decimals with 2 decimal places (up to 999,999.99) and are serialized as strings.
 
@@ -62,7 +62,7 @@ is written when a landlord is banned, so unbanning shows the properties again.
 
 | Action                                                 | Hidden or banned-landlord property |
 | ------------------------------------------------------ | ---------------------------------- |
-| Public list, get by ID, and [reviews](review.md)       | Not shown, `404` for a single read |
+| Public list, get by ID, and reviews                    | Not shown, `404` for a single read |
 | Create a request                                       | `404 Property not found`           |
 | Landlord approves a `PENDING` request                  | `409 Property isn't available`     |
 | Tenant creates or reuses a checkout                    | `409 Property isn't available`     |
@@ -184,11 +184,11 @@ Creates a property owned by the signed-in landlord. New properties start as `AVA
 | `name`        | string   | Trimmed, 2 to 100 characters             |
 | `description` | string   | Trimmed, 10 to 2000 characters           |
 | `location`    | string   | Trimmed, 2 to 200 characters             |
-| `images`      | string[] | 1 to 2 [UploadThing](upload.md) URLs     |
+| `images`      | string[] | 1 to 2 UploadThing URLs                  |
 | `rent`        | number   | Greater than 0, at most 2 decimal places |
 | `deposit`     | number   | Greater than 0, at most 2 decimal places |
 
-Upload the images first (see [Upload](upload.md)) and send the URLs it returns. URLs from any
+[Upload](upload.md) the images first and send the URLs it returns. URLs from any
 other host are rejected.
 
 **Example**
@@ -240,7 +240,7 @@ Partial update. Send at least one field.
 | `name`        | string   | Trimmed, 2 to 100 characters                                                                       |
 | `description` | string   | Trimmed, 10 to 2000 characters                                                                     |
 | `location`    | string   | Trimmed, 2 to 200 characters                                                                       |
-| `images`      | string[] | 1 to 2 [UploadThing](upload.md) URLs. Replaces the existing list                                   |
+| `images`      | string[] | 1 to 2 UploadThing URLs. Replaces the existing list                                                |
 | `rent`        | number   | Greater than 0, at most 2 decimal places                                                           |
 | `deposit`     | number   | Greater than 0, at most 2 decimal places                                                           |
 | `status`      | enum     | `AVAILABLE` or `UNAVAILABLE`. `RESERVED` and `RENTED` are set by the request and payment flow only |

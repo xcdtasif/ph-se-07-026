@@ -15,7 +15,7 @@ request. The amount is charged in BDT (Stripe amounts are in paisa, so the depos
 
 The Stripe webhook is called by Stripe, not by clients. See [Stripe Webhook](#stripe-webhook).
 
-## Payment object
+## Payment Object
 
 ```json
 {
@@ -41,7 +41,7 @@ The Stripe webhook is called by Stripe, not by clients. See [Stripe Webhook](#st
 
 `amount` is a decimal with 2 decimal places and is serialized as a string.
 
-### Payment flow
+### Payment Flow
 
 1. The landlord approves the request, so the request is `APPROVED` and the property is `RESERVED`.
 2. The tenant calls `POST /api/tenant/payments/create`, which returns a `PENDING` payment and a
@@ -115,8 +115,8 @@ The `201` response is a payment object with an extra `checkoutUrl` (the Stripe C
 | 502    | Stripe rejected the request or failed | `Payment provider error`               |
 | 503    | Stripe unreachable                    | `Payment provider unavailable`         |
 
-A [hidden](property.md#visibility) property or a banned landlord blocks new checkouts, including
-reusing an open one. A checkout that was already created can still be paid, and its webhook is
+A [hidden](property.md#visibility) property or a banned landlord blocks new checkouts, including reusing an open one.
+A checkout that was already created can still be paid, and its webhook is
 processed normally.
 
 ---

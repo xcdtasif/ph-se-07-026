@@ -14,7 +14,7 @@
 | [Update Request Status](#update-request-status)                     | `PATCH /api/landlord/requests/:id {…}` | Landlord |
 | [Get All Requests (Admin)](#get-all-requests-admin)                 | `GET /api/admin/requests?…`            | Admin    |
 
-## Request object
+## Request Object
 
 ```json
 {
@@ -41,7 +41,7 @@
 Landlord responses also include `tenant`: `{ "id", "name", "email" }`, placed before `property`, to
 match the order of `tenantId` and `propertyId`.
 
-### Status flow
+### Status Flow
 
 Request status and property status move together:
 
@@ -78,8 +78,8 @@ Rules that follow from this:
   checkout in progress (a `PENDING` payment younger than 35 minutes). The request returns to normal
   once the checkout is paid or expires.
 - A request can't be created or approved for a [hidden](property.md#visibility) property or one
-  whose landlord is banned. Rejecting and cancelling stay allowed, so such a request can always be
-  ended.
+  whose landlord is banned. Rejecting and cancelling stay
+  allowed, so such a request can always be ended.
 - Each status change and its property change are applied in one transaction, so both succeed or
   neither does.
 

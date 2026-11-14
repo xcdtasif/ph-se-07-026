@@ -14,7 +14,7 @@
 | [Get All Reviews (Admin)](#get-all-reviews-admin)                 | `GET /api/admin/reviews?…`                  | Admin    |
 | [Update Review Visibility](#update-review-visibility)             | `PATCH /api/admin/reviews/:id {…}`          | Admin    |
 
-## Review object
+## Review Object
 
 ```json
 {

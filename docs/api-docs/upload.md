@@ -16,7 +16,7 @@ returned URLs on a property.
 4. The client sends those URLs as `images` in [Create Property](property.md#create-property) or
    [Update Property](property.md#update-property).
 
-## `propertyImage` route
+## `propertyImage` Route
 
 | Rule      | Value                   |
 | --------- | ----------------------- |
@@ -28,13 +28,13 @@ returned URLs on a property.
 Upload landscape images with a 3:2 aspect ratio (for example 1200 x 800). The API doesn't enforce
 the ratio, so crop on the client before uploading.
 
-## UploadThing callback
+## UploadThing Callback
 
 When an upload finishes, UploadThing calls `/api/uploadthing` from its own servers with an
 `uploadthing-hook` header. That call has no cookie, so it skips the auth check and is verified by
 UploadThing's signature instead. Clients never call it.
 
-## Stored images
+## Stored Images
 
 - `images` on a property only accepts URLs that start with this app's UploadThing URL
   (`https://<appId>.ufs.sh/f/`). Any other URL is rejected with `Validation of body failed`.

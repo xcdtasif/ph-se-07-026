@@ -11,7 +11,7 @@
 | [Update Category](#update-category)       | `PATCH /api/categories/:id {…}` | Admin  |
 | [Delete Category](#delete-category)       | `DELETE /api/categories/:id`    | Admin  |
 
-## Category object
+## Category Object
 
 ```json
 {

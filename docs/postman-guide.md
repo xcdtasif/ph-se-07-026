@@ -7,7 +7,7 @@ who may call it (`Public`, `Authenticated`, `Tenant`, `Landlord`, `Admin`):
 
 The Stripe webhook and the UploadThing route are left out. Stripe and the UploadThing client call
 them, not you. To run the requests yourself, use **Run in Postman** on that page to import the
-collection, then follow this guide. For endpoint rules and responses see [the API docs](api-docs).
+collection, then follow this guide. For endpoint rules and responses see [API Docs](../README.md#api-docs).
 
 ## Environment
 
@@ -42,24 +42,24 @@ fails with `400 Validation of body failed`.
 ## Authentication
 
 The API authenticates with `httpOnly` cookies (`accessToken` and `refreshToken`). Postman keeps them
-in its cookie jar, so there is no token to copy.
+in its cookie jar, so there's no token to copy.
 
 1. Send **Auth / Public / Login User** with the account for the role you want to test.
 2. Send the requests for that role. The cookie is attached automatically.
 3. To switch roles, log in again as the other user. A new login replaces the cookie.
 
 Sample accounts come from `npm run db:seed` and are listed under
-[Seed data](../README.md#seed-data). The admin account is the one in `ADMIN_EMAIL` and
+[Seed Data](../README.md#seed-data). The admin account is the one in `ADMIN_EMAIL` and
 `ADMIN_PASSWORD`. Edit the email and password in the **Login User** body to switch accounts.
 `401` means the cookie is missing or expired. Log in again, or send **Refresh Tokens**.
 
-## Example IDs and bodies
+## Example IDs And Bodies
 
 The UUIDs in the URLs and bodies are examples from one database, so most of them return `404` on
 yours. Replace them with IDs from your own responses. For instance, take a property ID from **Get
 All Properties** or **Get Own Properties**.
 
-## Trying the rental flow
+## Trying The Rental Flow
 
 Each step needs the role in brackets and the ID from the previous step.
 

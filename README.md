@@ -16,7 +16,7 @@ Live API: <https://ph-se-07-026.vercel.app>
 
 Users pick `TENANT` or `LANDLORD` when they register. Admins are created by the seed script only.
 
-### Rental flow
+### Rental Flow
 
 1. A landlord lists a property (`AVAILABLE`).
 2. A tenant sends a request (`PENDING`).
@@ -41,7 +41,7 @@ See [Request](docs/api-docs/request.md) and [Payment](docs/api-docs/payment.md) 
 
 See [User](docs/api-docs/user.md) and [Property](docs/api-docs/property.md#visibility).
 
-## Tech stack
+## Tech Stack
 
 | Area       | Technology                                        |
 | ---------- | ------------------------------------------------- |
@@ -55,7 +55,7 @@ See [User](docs/api-docs/user.md) and [Property](docs/api-docs/property.md#visib
 | Tooling    | oxlint, oxfmt, tsx, mise                          |
 | Deployment | Vercel                                            |
 
-## Getting started
+## Getting Started
 
 ### Prerequisites
 
@@ -90,7 +90,7 @@ npm run stripe:listen
 
 `stripe:listen` prints a signing secret. Put it in `STRIPE_WEBHOOK_SECRET`.
 
-### Environment variables
+### Environment Variables
 
 The server reads every variable below except `ADMIN_*` at startup, in development and in
 production, and refuses to start if one is missing. The seed script reads the `ADMIN_*` variables,
@@ -117,7 +117,7 @@ and `ADMIN_NAME` is optional.
 | `UPLOADTHING_TOKEN`            | UploadThing token                                   |
 | `UPLOADTHING_APP_ID`           | UploadThing app id, used to validate image URLs     |
 
-### Seed data
+### Seed Data
 
 `npm run db:seed` is safe to repeat. It always creates the admin from the `ADMIN_*` variables and
 four categories (Apartment, House, Studio, Commercial). Outside production it also creates sample
@@ -151,7 +151,7 @@ in Bashundhara", so the payment flow can be tried right away. The sample data is
 | `npm run lint`          | Lint the code and apply fixes                     |
 | `npm run stripe:listen` | Forward Stripe webhooks to the local server       |
 
-## API docs
+## API Docs
 
 Each module has its own page with an endpoint table, the object shape, and every request with its
 validation rules and responses.
@@ -168,8 +168,8 @@ validation rules and responses.
 | [Upload](docs/api-docs/upload.md)     | Property image uploads through UploadThing           |
 
 The endpoints are also published as
-[Postman docs](https://documenter.getpostman.com/view/55697110/2sBYHaPcqk). To run the requests
-against your own server, see the [Postman guide](docs/postman-guide.md).
+[Postman Docs](https://documenter.getpostman.com/view/55697110/2sBYHaPcqk). To run the requests
+against your own server, see the [Postman Guide](docs/postman-guide.md).
 
 ### Conventions
 
@@ -183,10 +183,10 @@ Authentication uses two `httpOnly` cookies, set on register, login and refresh:
 | `refreshToken` | `POST /api/auth/refresh` only |
 
 Send requests with credentials (`credentials: "include"` in `fetch`). Protected routes return
-`401` when the cookie is missing, invalid or the user no longer exists, and `403` when the user
+`401` when the cookie is missing, invalid or the account no longer exists, and `403` when the user
 is banned or their role isn't allowed.
 
-#### Response envelope
+#### Response Envelope
 
 Every response, success or error, has this shape:
 
@@ -263,7 +263,7 @@ Six models: `User`, `Category`, `Property`, `Request`, `Payment` and `Review`. S
 [ERD](docs/erd.svg). The schema is split by model in `prisma/models`,
 with migrations in `prisma/migrations`.
 
-## Project structure
+## Project Structure
 
 ```
 src/

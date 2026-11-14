@@ -11,7 +11,7 @@
 | [Logout User](#logout-user)       | `POST /api/auth/logout`       | Public        |
 | [Refresh Tokens](#refresh-tokens) | `POST /api/auth/refresh`      | Authenticated |
 
-## User object
+## User Object
 
 Returned by every auth endpoint that responds with a user. The password is never included.
 
@@ -124,5 +124,5 @@ Issues a new access token and refresh token and sets both cookies.
 | ------ | -------------------------------- | ---------------------------------------- |
 | 200    | Success                          | `Tokens refreshed successfully`          |
 | 401    | Missing or invalid refresh token | `Authentication required`                |
-| 401    | User no longer exists            | `Account not found, please log in again` |
+| 401    | Account no longer exists         | `Account not found, please log in again` |
 | 403    | Account is banned                | `Your account has been banned`           |
