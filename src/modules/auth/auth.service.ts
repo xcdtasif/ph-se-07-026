@@ -70,7 +70,7 @@ const refreshTokens = async (token: string) => {
   })
 
   if (!user) {
-    throw new AppError(httpStatus.UNAUTHORIZED, "User no longer exists")
+    throw new AppError(httpStatus.UNAUTHORIZED, "Account not found, please log in again")
   }
 
   if (user.isBanned) {
