@@ -3,6 +3,7 @@ import httpStatus from "http-status"
 import type { Prisma, PropertyStatus } from "../../generated/prisma/client.js"
 import { prisma } from "../../lib/prisma.js"
 import { AppError } from "../../utils/app-error.js"
+import { categoryService } from "../category/category.service.js"
 import { reviewService } from "../review/review.service.js"
 import { uploadService } from "../upload/upload.service.js"
 import { visiblePropertyWhere } from "./property.filters.js"
@@ -95,16 +96,8 @@ const getPropertyById = async (id: string) => {
   return { ...property, ...summaryFor(id) }
 }
 
-const assertCategoryExists = async (categoryId: string) => {
-  const category = await prisma.category.findUnique({ where: { id: categoryId } })
-
-  if (!category) {
-    throw new AppError(httpStatus.NOT_FOUND, "Category not found")
-  }
-}
-
 const createProperty = async (landlordId: string, payload: CreatePropertyPayload) => {
-  await assertCategoryExists(payload.categoryId)
+  await categoryService.assertCategoryExists(payload.categoryId)
 
   return prisma.property.create({
     data: { ...payload, landlordId },
@@ -116,7 +109,7 @@ const updateProperty = async (id: string, landlordId: string, payload: UpdatePro
   const existing = await getOwnedProperty(id, landlordId)
 
   if (payload.categoryId) {
-    await assertCategoryExists(payload.categoryId)
+    await categoryService.assertCategoryExists(payload.categoryId)
   }
 
   const data = payload as Prisma.PropertyUncheckedUpdateManyInput

@@ -8,6 +8,14 @@ const getAllCategories = () => {
   return prisma.category.findMany({ orderBy: { name: "asc" } })
 }
 
+const assertCategoryExists = async (id: string) => {
+  const category = await prisma.category.findUnique({ where: { id } })
+
+  if (!category) {
+    throw new AppError(httpStatus.NOT_FOUND, "Category not found")
+  }
+}
+
 const assertNameAvailable = async (name: string, excludeId?: string) => {
   const existing = await prisma.category.findFirst({
     where: {
@@ -28,6 +36,7 @@ const createCategory = async (payload: CreateCategoryPayload) => {
 }
 
 const updateCategory = async (id: string, payload: UpdateCategoryPayload) => {
+  await assertCategoryExists(id)
   await assertNameAvailable(payload.name, id)
 
   return prisma.category.update({ where: { id }, data: { name: payload.name } })
@@ -51,6 +60,7 @@ const deleteCategory = async (id: string) => {
 }
 
 export const categoryService = {
+  assertCategoryExists,
   getAllCategories,
   createCategory,
   updateCategory,
